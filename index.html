@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>LifeOS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0c0c10;--surface:#13131a;--surface2:#1a1a24;--border:#222230;
+  --text:#e4e4ed;--text2:#9595a8;--accent:#8b82f0;--accent2:#6e64d2;
+  --green:#4ade80;--red:#f87171;--yellow:#facc15;
+  --font-body:'Inter',sans-serif;--font-display:'Crimson Pro',serif;
+  --radius:12px;--radius-sm:8px;
+}
+html{font-size:16px;background:var(--bg);color:var(--text);font-family:var(--font-body)}
+body{display:flex;min-height:100vh;overflow-x:hidden}
+a{color:var(--accent);text-decoration:none}
+
+/* Sidebar */
+.sidebar{
+  width:240px;background:var(--surface);border-right:1px solid var(--border);
+  display:flex;flex-direction:column;padding:24px 16px;position:fixed;
+  top:0;left:0;height:100vh;z-index:100;transition:transform .25s ease;
+}
+.sidebar-brand{font-family:var(--font-display);font-size:1.75rem;font-weight:700;color:var(--accent);margin-bottom:32px;padding-left:8px}
+.nav-link{
+  display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:var(--radius-sm);
+  color:var(--text2);font-weight:500;font-size:.9rem;cursor:pointer;border:none;
+  background:none;width:100%;text-align:left;transition:all .15s;
+}
+.nav-link:hover{color:var(--text);background:var(--surface2)}
+.nav-link.active{color:var(--accent);background:rgba(139,130,240,.1)}
+.nav-link svg{width:20px;height:20px;flex-shrink:0}
+.sync-status{margin-top:auto;padding:10px 12px;font-size:.8rem;color:var(--text2);display:flex;align-items:center;gap:8px}
+.sync-dot{width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0}
+.sync-dot.saving{background:var(--yellow);animation:pulse 1s infinite}
+.sync-dot.offline{background:var(--red)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+/* Hamburger */
+.hamburger{
+  display:none;position:fixed;top:16px;left:16px;z-index:200;background:var(--surface);
+  border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 10px;cursor:pointer;
+}
+.hamburger span{display:block;width:20px;height:2px;background:var(--text);margin:4px 0;transition:all .2s}
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:90}
+
+/* Main */
+.main{margin-left:240px;flex:1;padding:32px;max-width:1200px;width:100%}
+.page{display:none}
+.page.active{display:block}
+.page-title{font-family:var(--font-display);font-size:2rem;font-weight:700;margin-bottom:24px}
+
+/* Cards grid */
+.cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;margin-bottom:32px}
+.domain-card{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;
+  display:flex;flex-direction:column;gap:8px;
+}
+.domain-card .card-icon{font-size:1.5rem}
+.domain-card .card-title{font-weight:600;font-size:1rem}
+.domain-card .card-desc{color:var(--text2);font-size:.85rem;line-height:1.5}
+
+/* Info boxes */
+.info-box{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+  padding:20px;margin-bottom:16px;
+}
+.info-box h3{font-size:1rem;font-weight:600;margin-bottom:12px;color:var(--accent)}
+.info-box ul{list-style:none;display:flex;flex-direction:column;gap:6px}
+.info-box li{font-size:.9rem;color:var(--text2);padding-left:16px;position:relative}
+.info-box li::before{content:"→";position:absolute;left:0;color:var(--accent)}
+.blocker-box{border-color:var(--red);background:rgba(248,113,113,.04)}
+.blocker-box h3{color:var(--red)}
+
+/* Disciplines */
+.date-nav{display:flex;align-items:center;gap:16px;margin-bottom:24px}
+.date-nav button{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);
+  color:var(--text);padding:8px 14px;cursor:pointer;font-size:.9rem;transition:all .15s;
+}
+.date-nav button:hover{border-color:var(--accent);color:var(--accent)}
+.date-label{font-family:var(--font-display);font-size:1.3rem;font-weight:600;min-width:160px;text-align:center}
+.stats-row{display:flex;gap:16px;margin-bottom:24px;flex-wrap:wrap}
+.stat-card{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+  padding:16px 20px;flex:1;min-width:140px;
+}
+.stat-label{font-size:.8rem;color:var(--text2);margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px}
+.stat-value{font-family:var(--font-display);font-size:2rem;font-weight:700;color:var(--accent)}
+.category-section{margin-bottom:24px}
+.category-title{
+  font-size:.85rem;font-weight:600;text-transform:uppercase;letter-spacing:1px;
+  color:var(--text2);margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border);
+}
+.habit-row{
+  display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:var(--radius-sm);
+  transition:background .15s;
+}
+.habit-row:hover{background:var(--surface2)}
+.habit-check{
+  appearance:none;width:22px;height:22px;border:2px solid var(--border);border-radius:6px;
+  cursor:pointer;flex-shrink:0;position:relative;transition:all .15s;background:transparent;
+}
+.habit-check:checked{background:var(--accent);border-color:var(--accent)}
+.habit-check:checked::after{content:"✓";position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:.8rem;font-weight:700}
+.habit-label{font-size:.9rem;flex:1}
+.habit-input{
+  background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);
+  color:var(--text);padding:6px 10px;font-size:.85rem;font-family:var(--font-body);width:160px;
+}
+.habit-input:focus{outline:none;border-color:var(--accent)}
+
+/* Weekly scores */
+.week-nav{display:flex;align-items:center;gap:16px;margin-bottom:24px}
+.week-nav button{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);
+  color:var(--text);padding:8px 14px;cursor:pointer;font-size:.9rem;transition:all .15s;
+}
+.week-nav button:hover{border-color:var(--accent);color:var(--accent)}
+.week-label{font-family:var(--font-display);font-size:1.3rem;font-weight:600;min-width:140px;text-align:center}
+.tab-bar{display:flex;gap:4px;margin-bottom:24px;background:var(--surface);border-radius:var(--radius-sm);padding:4px;width:fit-content}
+.tab-btn{
+  padding:8px 20px;border-radius:6px;border:none;background:none;color:var(--text2);
+  font-size:.9rem;font-weight:500;cursor:pointer;transition:all .15s;
+}
+.tab-btn.active{background:var(--accent);color:#fff}
+.score-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;margin-bottom:24px}
+.score-item{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 20px;
+}
+.score-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.score-domain{font-weight:600;font-size:.95rem}
+.score-value{font-family:var(--font-display);font-size:1.5rem;font-weight:700;color:var(--accent)}
+.score-slider{
+  width:100%;appearance:none;height:6px;border-radius:3px;background:var(--surface2);
+  outline:none;cursor:pointer;
+}
+.score-slider::-webkit-slider-thumb{
+  appearance:none;width:20px;height:20px;border-radius:50%;background:var(--accent);cursor:pointer;
+}
+.score-slider::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:var(--accent);border:none;cursor:pointer}
+.save-btn{
+  background:var(--accent);color:#fff;border:none;border-radius:var(--radius-sm);
+  padding:12px 32px;font-size:1rem;font-weight:600;cursor:pointer;transition:all .15s;
+}
+.save-btn:hover{background:var(--accent2)}
+.save-btn:active{transform:scale(.97)}
+
+/* Trends chart */
+.chart-container{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+  padding:24px;margin-bottom:24px;overflow-x:auto;
+}
+.chart-container canvas{width:100%!important;max-height:400px}
+.delta-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
+.delta-item{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);
+  padding:12px 16px;display:flex;justify-content:space-between;align-items:center;
+}
+.delta-domain{font-size:.9rem;font-weight:500}
+.delta-value{font-family:var(--font-display);font-size:1.2rem;font-weight:700}
+.delta-up{color:var(--green)}
+.delta-down{color:var(--red)}
+.delta-flat{color:var(--text2)}
+
+/* Responsive */
+@media(max-width:768px){
+  .sidebar{transform:translateX(-100%)}
+  .sidebar.open{transform:translateX(0)}
+  .hamburger{display:block}
+  .overlay.open{display:block}
+  .main{margin-left:0;padding:16px;padding-top:60px}
+  .cards-grid{grid-template-columns:1fr}
+  .score-grid{grid-template-columns:1fr}
+  .stat-card{min-width:100px}
+}
+</style>
+</head>
+<body>
+
+<!-- Hamburger (mobile) -->
+<button class="hamburger" onclick="toggleSidebar()" aria-label="Menu">
+  <span></span><span></span><span></span>
+</button>
+<div class="overlay" onclick="toggleSidebar()"></div>
+
+<!-- Sidebar -->
+<nav class="sidebar">
+  <div class="sidebar-brand">LifeOS</div>
+  <button class="nav-link active" onclick="showPage('dashboard',this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+    Dashboard
+  </button>
+  <button class="nav-link" onclick="showPage('disciplines',this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+    Daily Disciplines
+  </button>
+  <button class="nav-link" onclick="showPage('scores',this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
+    Weekly Scores
+  </button>
+  <div class="sync-status">
+    <span class="sync-dot" id="syncDot"></span>
+    <span id="syncLabel">Checking…</span>
+  </div>
+</nav>
+
+<!-- Main content -->
+<div class="main">
+
+  <!-- Dashboard -->
+  <div class="page active" id="page-dashboard">
+    <h1 class="page-title">Dashboard</h1>
+
+    <div class="cards-grid">
+      <div class="domain-card">
+        <div class="card-icon">✝️</div>
+        <div class="card-title">Faith</div>
+        <div class="card-desc">Daily Mass, Rosary, Adoration, personal prayer life. Foundation of everything.</div>
+      </div>
+      <div class="domain-card">
+        <div class="card-icon">🕊️</div>
+        <div class="card-title">Ministry</div>
+        <div class="card-desc">Jesus Youth, Nightfever, Emmaus, Global2033. Leading and serving the Church.</div>
+      </div>
+      <div class="domain-card">
+        <div class="card-icon">💰</div>
+        <div class="card-title">Finance</div>
+        <div class="card-desc">Budgeting, savings, investments. Building financial freedom and generosity.</div>
+      </div>
+      <div class="domain-card">
+        <div class="card-icon">💼</div>
+        <div class="card-title">Career</div>
+        <div class="card-desc">Manufacturing → Validation/CQV Engineering. Growing expertise and moving up.</div>
+      </div>
+      <div class="domain-card">
+        <div class="card-icon">⚡</div>
+        <div class="card-title">GridNodes</div>
+        <div class="card-desc">AI automation business using n8n. Building systems and recurring revenue.</div>
+      </div>
+      <div class="domain-card">
+        <div class="card-icon">🏋️</div>
+        <div class="card-title">Health</div>
+        <div class="card-desc">Workout, nutrition, sleep, energy. The body is the vehicle for everything else.</div>
+      </div>
+      <div class="domain-card">
+        <div class="card-icon">🤝</div>
+        <div class="card-title">Relationships</div>
+        <div class="card-desc">Friends, community, staying connected. No man is an island.</div>
+      </div>
+      <div class="domain-card">
+        <div class="card-icon">👨‍👩‍👧</div>
+        <div class="card-title">Family</div>
+        <div class="card-desc">Parents, siblings, extended family. Honouring and investing in family bonds.</div>
+      </div>
+    </div>
+
+    <div class="info-box">
+      <h3>Priority Stack</h3>
+      <ul>
+        <li>Faith — non-negotiable foundation</li>
+        <li>Health — energy for everything else</li>
+        <li>Career — Validation/CQV move</li>
+        <li>Ministry — leadership and service</li>
+        <li>GridNodes — automation side business</li>
+        <li>Finance — freedom and generosity</li>
+        <li>Relationships — community and connection</li>
+        <li>Family — roots and belonging</li>
+      </ul>
+    </div>
+
+    <div class="info-box">
+      <h3>Ministry Roles</h3>
+      <ul>
+        <li>Jesus Youth Music Coordinator — Ireland</li>
+        <li>Nightfever Coordinator — Dublin</li>
+        <li>Emmaus — active member</li>
+        <li>Global2033 — contributor</li>
+      </ul>
+    </div>
+
+    <div class="info-box">
+      <h3>Career Tracks</h3>
+      <ul>
+        <li>Primary: Validation / CQV Engineering</li>
+        <li>Secondary: AI Automation (GridNodes)</li>
+      </ul>
+    </div>
+
+    <div class="info-box blocker-box">
+      <h3>Core Blocker</h3>
+      <ul>
+        <li>Discipline consistency — the gap between intention and execution</li>
+        <li>Track daily. Score weekly. Adjust monthly. Stay honest.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Daily Disciplines -->
+  <div class="page" id="page-disciplines">
+    <h1 class="page-title">Daily Disciplines</h1>
+
+    <div class="date-nav">
+      <button onclick="changeDate(-1)">← Prev</button>
+      <div class="date-label" id="dateLabel"></div>
+      <button onclick="changeDate(1)">Next →</button>
+      <button onclick="goToday()" style="margin-left:auto">Today</button>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-label">Completion</div>
+        <div class="stat-value" id="completionPct">0%</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Streak</div>
+        <div class="stat-value" id="streakCount">0</div>
+      </div>
+    </div>
+
+    <div id="habitsContainer"></div>
+
+    <div style="margin-top:24px">
+      <button class="save-btn" onclick="saveDisciplines()">Save Entry</button>
+    </div>
+  </div>
+
+  <!-- Weekly Scores -->
+  <div class="page" id="page-scores">
+    <h1 class="page-title">Weekly Scores</h1>
+
+    <div class="week-nav">
+      <button onclick="changeWeek(-1)">← Prev</button>
+      <div class="week-label" id="weekLabel"></div>
+      <button onclick="changeWeek(1)">Next →</button>
+      <button onclick="goCurrentWeek()" style="margin-left:auto">This Week</button>
+    </div>
+
+    <div class="tab-bar">
+      <button class="tab-btn active" onclick="showScoreTab('entry',this)">Entry</button>
+      <button class="tab-btn" onclick="showScoreTab('trends',this)">Trends</button>
+    </div>
+
+    <div id="scoreEntry">
+      <div class="score-grid" id="scoreGrid"></div>
+      <button class="save-btn" onclick="saveScores()">Save Scores</button>
+    </div>
+
+    <div id="scoreTrends" style="display:none">
+      <div class="chart-container">
+        <canvas id="trendsChart"></canvas>
+      </div>
+      <h3 style="font-size:1rem;margin-bottom:12px;color:var(--text2)">Week-on-Week Delta</h3>
+      <div class="delta-grid" id="deltaGrid"></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Chart.js (lightweight, self-contained) -->
+<script>
+(function(){
+  const C=document.createElement('script');
+  C.src='https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js';
+  C.onload=()=>{if(typeof renderTrendsChart==='function')renderTrendsChart()};
+  document.head.appendChild(C);
+})();
+</script>
+
+<script>
+// ─── Supabase config ────────────────────────────────────────
+const SUPABASE_URL = 'https://vjumuvdzrerxoxpjcfwl.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_ZDZTWno-Wg4ip3_PqKMl0Q_7DjwWfDQ';
+
+const SB_HEADERS = {
+  'apikey': SUPABASE_KEY,
+  'Authorization': 'Bearer ' + SUPABASE_KEY,
+  'Content-Type': 'application/json',
+  'Prefer': 'return=minimal'
+};
+
+let syncOnline = false;
+
+async function sbFetch(table, method, body, query) {
+  const url = `${SUPABASE_URL}/rest/v1/${table}${query || ''}`;
+  try {
+    const opts = { method, headers: { ...SB_HEADERS, ...(method === 'GET' ? {} : { 'Prefer': 'resolution=merge-duplicates,return=minimal' }) } };
+    if (body) opts.body = JSON.stringify(body);
+    const r = await fetch(url, opts);
+    if (!r.ok) throw new Error(r.status);
+    syncOnline = true;
+    updateSyncStatus('synced');
+    if (method === 'GET') return r.json();
+    return true;
+  } catch (e) {
+    syncOnline = false;
+    updateSyncStatus('offline');
+    return null;
+  }
+}
+
+function updateSyncStatus(state) {
+  const dot = document.getElementById('syncDot');
+  const label = document.getElementById('syncLabel');
+  dot.className = 'sync-dot';
+  if (state === 'synced') { label.textContent = 'Synced ✓'; }
+  else if (state === 'saving') { dot.classList.add('saving'); label.textContent = 'Saving…'; }
+  else { dot.classList.add('offline'); label.textContent = 'Local only'; }
+}
+
+// ─── LocalStorage helpers ───────────────────────────────────
+function lsGet(key) { try { return JSON.parse(localStorage.getItem(key)) || {}; } catch { return {}; } }
+function lsSet(key, val) { localStorage.setItem(key, JSON.stringify(val)); }
+
+// ─── Navigation ─────────────────────────────────────────────
+function showPage(id, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  if (id === 'disciplines') renderDisciplines();
+  if (id === 'scores') { renderScoreSliders(); renderTrendsChart(); renderDeltas(); }
+  if (window.innerWidth <= 768) toggleSidebar();
+}
+
+function toggleSidebar() {
+  document.querySelector('.sidebar').classList.toggle('open');
+  document.querySelector('.overlay').classList.toggle('open');
+}
+
+// ─── Disciplines ────────────────────────────────────────────
+const CATS = [
+  { name: 'Spiritual', habits: [
+    { id: 'mass', label: 'Mass', type: 'check' },
+    { id: 'rosary', label: 'Rosary', type: 'check' },
+    { id: 'adoration', label: 'Adoration', type: 'check' },
+    { id: 'dmc', label: 'DMC', type: 'check' },
+    { id: 'bible', label: 'Bible reading', type: 'check' },
+    { id: 'prayer', label: 'Personal prayer', type: 'check' },
+    { id: 'jy_ministry', label: 'JY / Ministry activity', type: 'check' },
+  ]},
+  { name: 'Physical', habits: [
+    { id: 'workout', label: 'Workout 30min', type: 'check' },
+    { id: 'breakfast', label: 'Breakfast', type: 'check' },
+    { id: 'lunch', label: 'Lunch', type: 'check' },
+    { id: 'dinner', label: 'Dinner', type: 'check' },
+  ]},
+  { name: 'Social', habits: [
+    { id: 'replied', label: 'Replied to everyone', type: 'check' },
+    { id: 'called', label: 'Called / talked with', type: 'text' },
+  ]},
+  { name: 'Mental', habits: [
+    { id: 'wake_time', label: 'Wake up time', type: 'time' },
+    { id: 'sleep_time', label: 'Sleep time', type: 'time' },
+    { id: 'rest_notes', label: 'Rest notes', type: 'text' },
+  ]},
+  { name: 'Intellectual', habits: [
+    { id: 'reading', label: 'Book reading 30min', type: 'check' },
+    { id: 'project', label: 'Work on project', type: 'check' },
+  ]},
+];
+
+let currentDate = new Date();
+let disciplineCache = lsGet('discipline_log');
+
+function dateStr(d) {
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+
+function formatDate(d) {
+  return d.toLocaleDateString('en-IE', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' });
+}
+
+function changeDate(delta) {
+  currentDate.setDate(currentDate.getDate() + delta);
+  renderDisciplines();
+}
+
+function goToday() {
+  currentDate = new Date();
+  renderDisciplines();
+}
+
+function renderDisciplines() {
+  const key = dateStr(currentDate);
+  document.getElementById('dateLabel').textContent = formatDate(currentDate);
+  const entry = disciplineCache[key] || {};
+  const container = document.getElementById('habitsContainer');
+  container.innerHTML = '';
+
+  CATS.forEach(cat => {
+    const section = document.createElement('div');
+    section.className = 'category-section';
+    section.innerHTML = `<div class="category-title">${cat.name}</div>`;
+
+    cat.habits.forEach(h => {
+      const row = document.createElement('div');
+      row.className = 'habit-row';
+      const val = entry[h.id] || '';
+
+      if (h.type === 'check') {
+        row.innerHTML = `
+          <input type="checkbox" class="habit-check" data-id="${h.id}" ${val ? 'checked' : ''}>
+          <span class="habit-label">${h.label}</span>`;
+      } else if (h.type === 'text') {
+        row.innerHTML = `
+          <span class="habit-label">${h.label}</span>
+          <input type="text" class="habit-input" data-id="${h.id}" value="${val}" placeholder="…">`;
+      } else if (h.type === 'time') {
+        row.innerHTML = `
+          <span class="habit-label">${h.label}</span>
+          <input type="time" class="habit-input" data-id="${h.id}" value="${val}">`;
+      }
+      section.appendChild(row);
+    });
+    container.appendChild(section);
+  });
+
+  updateCompletion();
+  updateStreak();
+}
+
+function gatherEntry() {
+  const entry = {};
+  document.querySelectorAll('.habit-check').forEach(el => { entry[el.dataset.id] = el.checked; });
+  document.querySelectorAll('.habit-input').forEach(el => { if (el.value) entry[el.dataset.id] = el.value; });
+  return entry;
+}
+
+function countChecked(entry) {
+  const checkIds = CATS.flatMap(c => c.habits.filter(h => h.type === 'check').map(h => h.id));
+  return checkIds.filter(id => entry[id]).length;
+}
+
+function totalCheckable() {
+  return CATS.reduce((n, c) => n + c.habits.filter(h => h.type === 'check').length, 0);
+}
+
+function updateCompletion() {
+  const entry = gatherEntry();
+  const pct = Math.round((countChecked(entry) / totalCheckable()) * 100);
+  document.getElementById('completionPct').textContent = pct + '%';
+}
+
+function updateStreak() {
+  let streak = 0;
+  const d = new Date();
+  d.setDate(d.getDate() - 1);
+  while (true) {
+    const key = dateStr(d);
+    const entry = disciplineCache[key];
+    if (!entry || countChecked(entry) < Math.floor(totalCheckable() * 0.7)) break;
+    streak++;
+    d.setDate(d.getDate() - 1);
+  }
+  const todayEntry = disciplineCache[dateStr(new Date())];
+  if (todayEntry && countChecked(todayEntry) >= Math.floor(totalCheckable() * 0.7)) streak++;
+  document.getElementById('streakCount').textContent = streak;
+}
+
+async function saveDisciplines() {
+  const key = dateStr(currentDate);
+  const entry = gatherEntry();
+  disciplineCache[key] = entry;
+  lsSet('discipline_log', disciplineCache);
+  updateCompletion();
+  updateStreak();
+
+  updateSyncStatus('saving');
+  await sbFetch('discipline_log', 'POST', { date: key, entry, updated_at: new Date().toISOString() });
+}
+
+// Listen for checkbox changes
+document.getElementById('habitsContainer').addEventListener('change', updateCompletion);
+
+// ─── Weekly Scores ──────────────────────────────────────────
+const DOMAINS = ['Faith','Ministry','Finance','Career','GridNodes','Health','Relationships','Family'];
+let currentWeekOffset = 0;
+let scoreCache = lsGet('score_log');
+
+function getWeekLabel(offset) {
+  const d = new Date();
+  d.setDate(d.getDate() + offset * 7);
+  const oneJan = new Date(d.getFullYear(), 0, 1);
+  const weekNum = Math.ceil(((d - oneJan) / 86400000 + oneJan.getDay() + 1) / 7);
+  return `W${weekNum} ${d.getFullYear()}`;
+}
+
+function changeWeek(delta) {
+  currentWeekOffset += delta;
+  renderScoreSliders();
+}
+
+function goCurrentWeek() {
+  currentWeekOffset = 0;
+  renderScoreSliders();
+}
+
+function renderScoreSliders() {
+  const wk = getWeekLabel(currentWeekOffset);
+  document.getElementById('weekLabel').textContent = wk;
+  const scores = scoreCache[wk] || {};
+  const grid = document.getElementById('scoreGrid');
+  grid.innerHTML = '';
+
+  DOMAINS.forEach(domain => {
+    const val = scores[domain] || 5;
+    const item = document.createElement('div');
+    item.className = 'score-item';
+    item.innerHTML = `
+      <div class="score-header">
+        <span class="score-domain">${domain}</span>
+        <span class="score-value" id="sv-${domain}">${val}</span>
+      </div>
+      <input type="range" class="score-slider" min="1" max="10" value="${val}"
+             oninput="document.getElementById('sv-${domain}').textContent=this.value">`;
+    grid.appendChild(item);
+  });
+}
+
+async function saveScores() {
+  const wk = getWeekLabel(currentWeekOffset);
+  const scores = {};
+  document.querySelectorAll('.score-slider').forEach((sl, i) => {
+    scores[DOMAINS[i]] = parseInt(sl.value);
+  });
+  scoreCache[wk] = scores;
+  lsSet('score_log', scoreCache);
+
+  updateSyncStatus('saving');
+  await sbFetch('score_log', 'POST', { week: wk, scores, updated_at: new Date().toISOString() });
+  renderTrendsChart();
+  renderDeltas();
+}
+
+function showScoreTab(tab, btn) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('scoreEntry').style.display = tab === 'entry' ? '' : 'none';
+  document.getElementById('scoreTrends').style.display = tab === 'trends' ? '' : 'none';
+  if (tab === 'trends') { renderTrendsChart(); renderDeltas(); }
+}
+
+// ─── Trends chart ───────────────────────────────────────────
+let chartInstance = null;
+
+function renderTrendsChart() {
+  if (typeof Chart === 'undefined') return;
+  const canvas = document.getElementById('trendsChart');
+  if (!canvas) return;
+
+  const weeks = Object.keys(scoreCache).sort();
+  if (weeks.length === 0) return;
+
+  const colors = ['#8b82f0','#4ade80','#f87171','#facc15','#38bdf8','#fb923c','#a78bfa','#f472b6'];
+  const datasets = DOMAINS.map((domain, i) => ({
+    label: domain,
+    data: weeks.map(w => (scoreCache[w] || {})[domain] || 0),
+    borderColor: colors[i],
+    backgroundColor: colors[i] + '20',
+    tension: 0.3,
+    pointRadius: 4,
+    borderWidth: 2,
+  }));
+
+  if (chartInstance) chartInstance.destroy();
+  chartInstance = new Chart(canvas, {
+    type: 'line',
+    data: { labels: weeks, datasets },
+    options: {
+      responsive: true,
+      plugins: { legend: { labels: { color: '#9595a8', font: { family: 'Inter' } } } },
+      scales: {
+        x: { ticks: { color: '#9595a8' }, grid: { color: '#222230' } },
+        y: { min: 0, max: 10, ticks: { color: '#9595a8', stepSize: 1 }, grid: { color: '#222230' } }
+      }
+    }
+  });
+}
+
+function renderDeltas() {
+  const weeks = Object.keys(scoreCache).sort();
+  const grid = document.getElementById('deltaGrid');
+  grid.innerHTML = '';
+  if (weeks.length < 2) { grid.innerHTML = '<p style="color:var(--text2);font-size:.9rem">Need at least 2 weeks of data for deltas.</p>'; return; }
+
+  const curr = scoreCache[weeks[weeks.length - 1]] || {};
+  const prev = scoreCache[weeks[weeks.length - 2]] || {};
+
+  DOMAINS.forEach(d => {
+    const delta = (curr[d] || 0) - (prev[d] || 0);
+    const cls = delta > 0 ? 'delta-up' : delta < 0 ? 'delta-down' : 'delta-flat';
+    const sign = delta > 0 ? '+' : '';
+    const item = document.createElement('div');
+    item.className = 'delta-item';
+    item.innerHTML = `<span class="delta-domain">${d}</span><span class="delta-value ${cls}">${sign}${delta}</span>`;
+    grid.appendChild(item);
+  });
+}
+
+// ─── Boot ───────────────────────────────────────────────────
+async function boot() {
+  // Load disciplines from Supabase
+  const discRows = await sbFetch('discipline_log', 'GET', null, '?select=date,entry');
+  if (discRows) {
+    discRows.forEach(r => { disciplineCache[r.date] = r.entry; });
+    lsSet('discipline_log', disciplineCache);
+  }
+
+  // Load scores from Supabase
+  const scoreRows = await sbFetch('score_log', 'GET', null, '?select=week,scores');
+  if (scoreRows) {
+    scoreRows.forEach(r => { scoreCache[r.week] = r.scores; });
+    lsSet('score_log', scoreCache);
+  }
+
+  renderDisciplines();
+  renderScoreSliders();
+}
+
+boot();
+</script>
+</body>
+</html>
