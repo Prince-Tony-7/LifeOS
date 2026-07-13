@@ -11,14 +11,14 @@
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#0c0c10;--surface:#13131a;--surface2:#1a1a24;--surface3:#20202e;
-  --border:#222230;--border2:#2a2a3a;
+  --bg:#0a0a12;--surface:#111119;--surface2:#181824;--surface3:#1e1e2e;
+  --border:#1f1f30;--border2:#282840;
   --text:#e4e4ed;--text2:#9595a8;--text3:#6a6a80;
-  --accent:#8b82f0;--accent2:#6e64d2;--accent-glow:rgba(139,130,240,.15);
-  --green:#4ade80;--green-dim:rgba(74,222,128,.12);
-  --red:#f87171;--red-dim:rgba(248,113,113,.1);
-  --yellow:#facc15;--yellow-dim:rgba(250,204,21,.1);
-  --blue:#38bdf8;--orange:#fb923c;--pink:#f472b6;--purple:#a78bfa;
+  --accent:#4166F5;--accent2:#3554DB;--accent-glow:rgba(65,102,245,.15);--accent-rgb:65,102,245;
+  --green:#4ade80;--green-dim:rgba(74,222,128,.1);
+  --red:#f87171;--red-dim:rgba(248,113,113,.08);
+  --yellow:#facc15;--yellow-dim:rgba(250,204,21,.08);
+  --blue:#38bdf8;--orange:#fb923c;--pink:#f472b6;--teal:#2dd4bf;
   --font-body:'Inter',sans-serif;--font-display:'Crimson Pro',serif;
   --radius:14px;--radius-sm:10px;--radius-xs:6px;
   --transition:all .2s cubic-bezier(.4,0,.2,1);
@@ -26,39 +26,18 @@
 html{font-size:16px;background:var(--bg);color:var(--text);font-family:var(--font-body);-webkit-font-smoothing:antialiased}
 body{display:flex;min-height:100vh;overflow-x:hidden}
 a{color:var(--accent);text-decoration:none}
-::-webkit-scrollbar{width:6px}
-::-webkit-scrollbar-track{background:transparent}
-::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
 
-/* ─── Toast ─── */
-.toast{
-  position:fixed;bottom:24px;right:24px;background:var(--surface2);border:1px solid var(--border);
-  border-radius:var(--radius-sm);padding:14px 20px;font-size:.9rem;z-index:999;
-  transform:translateY(100px);opacity:0;transition:var(--transition);display:flex;align-items:center;gap:10px;
-}
+.toast{position:fixed;bottom:24px;right:24px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 20px;font-size:.9rem;z-index:999;transform:translateY(100px);opacity:0;transition:var(--transition);display:flex;align-items:center;gap:10px}
 .toast.show{transform:translateY(0);opacity:1}
 .toast.success{border-color:var(--green);color:var(--green)}
 .toast.error{border-color:var(--red);color:var(--red)}
 
-/* ─── Sidebar ─── */
-.sidebar{
-  width:260px;background:var(--surface);border-right:1px solid var(--border);
-  display:flex;flex-direction:column;padding:28px 16px 20px;position:fixed;
-  top:0;left:0;height:100vh;z-index:100;transition:transform .3s cubic-bezier(.4,0,.2,1);
-}
-.sidebar-brand{
-  font-family:var(--font-display);font-size:2rem;font-weight:700;
-  color:var(--accent);margin-bottom:8px;padding-left:12px;
-  background:linear-gradient(135deg,var(--accent),var(--purple));
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-}
-.sidebar-tagline{font-size:.75rem;color:var(--text3);padding-left:12px;margin-bottom:28px}
+.sidebar{width:260px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:28px 16px 20px;position:fixed;top:0;left:0;height:100vh;z-index:100;transition:transform .3s cubic-bezier(.4,0,.2,1)}
+.sidebar-brand{font-family:var(--font-display);font-size:2rem;font-weight:700;margin-bottom:6px;padding-left:12px;background:linear-gradient(135deg,#4166F5,#38bdf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.sidebar-tagline{font-size:.72rem;color:var(--text3);padding-left:12px;margin-bottom:28px;letter-spacing:.3px}
 .nav-section{font-size:.65rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--text3);padding:16px 12px 8px;font-weight:600}
-.nav-link{
-  display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:var(--radius-sm);
-  color:var(--text2);font-weight:500;font-size:.9rem;cursor:pointer;border:none;
-  background:none;width:100%;text-align:left;transition:var(--transition);margin-bottom:2px;
-}
+.nav-link{display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:var(--radius-sm);color:var(--text2);font-weight:500;font-size:.9rem;cursor:pointer;border:none;background:none;width:100%;text-align:left;transition:var(--transition);margin-bottom:2px}
 .nav-link:hover{color:var(--text);background:var(--surface2)}
 .nav-link.active{color:var(--accent);background:var(--accent-glow);font-weight:600}
 .nav-link svg{width:20px;height:20px;flex-shrink:0;opacity:.7}
@@ -71,1319 +50,882 @@ a{color:var(--accent);text-decoration:none}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
 .sidebar-version{padding:4px 12px;font-size:.7rem;color:var(--text3)}
 
-/* ─── Hamburger ─── */
-.hamburger{
-  display:none;position:fixed;top:14px;left:14px;z-index:200;background:var(--surface);
-  border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 11px;cursor:pointer;
-}
+.hamburger{display:none;position:fixed;top:14px;left:14px;z-index:200;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 11px;cursor:pointer}
 .hamburger span{display:block;width:18px;height:2px;background:var(--text);margin:3px 0;transition:var(--transition);border-radius:1px}
 .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:90;backdrop-filter:blur(4px)}
 
-/* ─── Main ─── */
-.main{margin-left:260px;flex:1;padding:36px 40px;max-width:1200px;width:100%}
-.page{display:none;animation:fadeIn .3s ease}
-.page.active{display:block}
-@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-.page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:12px}
+.main{margin-left:260px;flex:1;padding:32px 36px;max-width:1200px;width:100%}
+.page{display:none;animation:fadeIn .25s ease}.page.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px}
 .page-title{font-family:var(--font-display);font-size:2.2rem;font-weight:700;letter-spacing:-.5px}
-.page-subtitle{color:var(--text2);font-size:.9rem}
+.page-subtitle{color:var(--text2);font-size:.85rem}
 
-/* ─── Hero Stats ─── */
-.hero-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:28px}
-.hero-stat{
-  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
-  padding:20px;position:relative;overflow:hidden;
-}
-.hero-stat::after{
-  content:'';position:absolute;top:0;left:0;right:0;height:2px;
-  background:linear-gradient(90deg,transparent,var(--accent),transparent);opacity:.5;
-}
-.hero-stat-label{font-size:.75rem;text-transform:uppercase;letter-spacing:.8px;color:var(--text3);margin-bottom:8px;font-weight:600}
-.hero-stat-value{font-family:var(--font-display);font-size:2.4rem;font-weight:700;color:var(--accent);line-height:1}
-.hero-stat-sub{font-size:.8rem;color:var(--text2);margin-top:6px}
+.hero-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px}
+.hero-stat{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px;position:relative;overflow:hidden}
+.hero-stat::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--accent),transparent);opacity:.4}
+.hero-stat-label{font-size:.7rem;text-transform:uppercase;letter-spacing:.8px;color:var(--text3);margin-bottom:6px;font-weight:600}
+.hero-stat-value{font-family:var(--font-display);font-size:2.2rem;font-weight:700;color:var(--accent);line-height:1}
+.hero-stat-sub{font-size:.75rem;color:var(--text2);margin-top:4px}
 
-/* ─── Progress Ring ─── */
 .progress-ring-wrap{display:flex;align-items:center;justify-content:center;position:relative}
 .progress-ring{transform:rotate(-90deg)}
 .progress-ring-bg{fill:none;stroke:var(--surface2);stroke-width:6}
 .progress-ring-fill{fill:none;stroke:var(--accent);stroke-width:6;stroke-linecap:round;transition:stroke-dashoffset .6s cubic-bezier(.4,0,.2,1)}
-.progress-ring-text{
-  position:absolute;font-family:var(--font-display);font-size:1.6rem;font-weight:700;color:var(--accent);
-}
-.progress-ring-label{position:absolute;bottom:-4px;font-size:.7rem;color:var(--text3);text-transform:uppercase;letter-spacing:.5px}
+.progress-ring-text{position:absolute;font-family:var(--font-display);font-size:1.5rem;font-weight:700;color:var(--accent)}
+.progress-ring-label{position:absolute;bottom:-2px;font-size:.65rem;color:var(--text3);text-transform:uppercase;letter-spacing:.5px}
 
-/* ─── Cards ─── */
-.cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;margin-bottom:28px}
-.domain-card{
-  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;
-  display:flex;flex-direction:column;gap:10px;transition:var(--transition);cursor:default;
-}
-.domain-card:hover{border-color:var(--border2);transform:translateY(-2px)}
-.card-header{display:flex;align-items:center;gap:12px}
-.card-icon{font-size:1.4rem;width:40px;height:40px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;background:var(--surface2)}
-.card-title{font-weight:600;font-size:1rem}
-.card-score{font-family:var(--font-display);font-size:1.8rem;font-weight:700;color:var(--accent)}
-.card-bar{height:4px;border-radius:2px;background:var(--surface2);overflow:hidden;margin-top:4px}
+.cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;margin-bottom:24px}
+.domain-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px;display:flex;flex-direction:column;gap:8px;transition:var(--transition);cursor:default}
+.domain-card:hover{border-color:var(--border2);transform:translateY(-1px)}
+.card-header{display:flex;align-items:center;gap:10px}
+.card-icon{font-size:1.3rem;width:36px;height:36px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;background:var(--surface2)}
+.card-title{font-weight:600;font-size:.95rem}
+.card-score{font-family:var(--font-display);font-size:1.6rem;font-weight:700;color:var(--accent)}
+.card-bar{height:3px;border-radius:2px;background:var(--surface2);overflow:hidden;margin-top:2px}
 .card-bar-fill{height:100%;border-radius:2px;background:var(--accent);transition:width .6s cubic-bezier(.4,0,.2,1)}
-.card-desc{color:var(--text2);font-size:.82rem;line-height:1.55}
-.card-mini-trend{display:flex;align-items:flex-end;gap:2px;height:24px;margin-top:4px}
-.card-mini-trend span{width:4px;border-radius:2px;background:var(--accent);opacity:.6;transition:var(--transition)}
+.card-desc{color:var(--text2);font-size:.8rem;line-height:1.5}
+.card-mini-trend{display:flex;align-items:flex-end;gap:2px;height:20px;margin-top:2px}
+.card-mini-trend span{width:3px;border-radius:2px;background:var(--accent);opacity:.6}
 
-/* ─── Info Boxes ─── */
-.info-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px;margin-bottom:28px}
-.info-box{
-  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;
-}
-.info-box h3{font-size:.95rem;font-weight:600;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.info-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;margin-bottom:24px}
+.info-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px}
+.info-box h3{font-size:.9rem;font-weight:600;margin-bottom:12px;display:flex;align-items:center;gap:8px}
 .info-box h3 .info-icon{color:var(--accent)}
-.info-box ul{list-style:none;display:flex;flex-direction:column;gap:8px}
-.info-box li{font-size:.85rem;color:var(--text2);padding-left:20px;position:relative;line-height:1.5}
-.info-box li::before{content:"";position:absolute;left:0;top:8px;width:6px;height:6px;border-radius:50%;background:var(--accent);opacity:.5}
-.blocker-box{border-color:rgba(248,113,113,.3);background:var(--red-dim)}
+.info-box ul{list-style:none;display:flex;flex-direction:column;gap:6px}
+.info-box li{font-size:.82rem;color:var(--text2);padding-left:18px;position:relative;line-height:1.5}
+.info-box li::before{content:"";position:absolute;left:0;top:8px;width:5px;height:5px;border-radius:50%;background:var(--accent);opacity:.5}
+.blocker-box{border-color:rgba(248,113,113,.25);background:var(--red-dim)}
 .blocker-box h3 .info-icon{color:var(--red)}
 .blocker-box li::before{background:var(--red)}
 
-/* ─── Calendar Heatmap ─── */
-.heatmap-wrap{
-  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
-  padding:20px;margin-bottom:28px;overflow-x:auto;
-}
-.heatmap-title{font-size:.95rem;font-weight:600;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.heatmap-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px;margin-bottom:24px;overflow-x:auto}
+.heatmap-title{font-size:.9rem;font-weight:600;margin-bottom:14px;display:flex;align-items:center;gap:8px}
 .heatmap{display:flex;gap:3px}
 .heatmap-week{display:flex;flex-direction:column;gap:3px}
-.heatmap-day{
-  width:14px;height:14px;border-radius:3px;background:var(--surface2);transition:var(--transition);cursor:pointer;position:relative;
-}
+.heatmap-day{width:13px;height:13px;border-radius:3px;background:var(--surface2);transition:var(--transition);cursor:pointer}
 .heatmap-day:hover{transform:scale(1.4);z-index:2}
-.heatmap-day[data-level="1"]{background:rgba(139,130,240,.2)}
-.heatmap-day[data-level="2"]{background:rgba(139,130,240,.4)}
-.heatmap-day[data-level="3"]{background:rgba(139,130,240,.6)}
+.heatmap-day[data-level="1"]{background:rgba(var(--accent-rgb),.2)}
+.heatmap-day[data-level="2"]{background:rgba(var(--accent-rgb),.4)}
+.heatmap-day[data-level="3"]{background:rgba(var(--accent-rgb),.65)}
 .heatmap-day[data-level="4"]{background:var(--accent)}
-.heatmap-day.future{opacity:.3}
-.heatmap-legend{display:flex;align-items:center;gap:6px;margin-top:12px;font-size:.75rem;color:var(--text3)}
-.heatmap-legend span{width:14px;height:14px;border-radius:3px}
-.heatmap-months{display:flex;gap:0;margin-bottom:6px;font-size:.7rem;color:var(--text3)}
-.heatmap-months span{text-align:center}
-.heatmap-tooltip{
-  position:fixed;background:var(--surface3);border:1px solid var(--border2);border-radius:var(--radius-xs);
-  padding:6px 10px;font-size:.78rem;color:var(--text);z-index:999;pointer-events:none;white-space:nowrap;
-  display:none;
-}
+.heatmap-day.future{opacity:.25}
+.heatmap-legend{display:flex;align-items:center;gap:5px;margin-top:10px;font-size:.7rem;color:var(--text3)}
+.heatmap-legend span{width:13px;height:13px;border-radius:3px}
+.heatmap-tooltip{position:fixed;background:var(--surface3);border:1px solid var(--border2);border-radius:var(--radius-xs);padding:6px 10px;font-size:.75rem;color:var(--text);z-index:999;pointer-events:none;white-space:nowrap;display:none}
 
-/* ─── Streak ─── */
-.streak-display{
-  display:flex;align-items:center;gap:16px;background:var(--surface);border:1px solid var(--border);
-  border-radius:var(--radius);padding:20px 24px;margin-bottom:28px;
-}
-.streak-flame{font-size:2.4rem;animation:flicker 1.5s ease-in-out infinite alternate}
-@keyframes flicker{0%{transform:scale(1) rotate(-3deg)}50%{transform:scale(1.1) rotate(3deg)}100%{transform:scale(1) rotate(-3deg)}}
+.streak-display{display:flex;align-items:center;gap:16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px 22px;margin-bottom:24px}
+.streak-flame{font-size:2.2rem;animation:flicker 1.5s ease-in-out infinite alternate}
+@keyframes flicker{0%{transform:scale(1) rotate(-3deg)}50%{transform:scale(1.08) rotate(3deg)}100%{transform:scale(1) rotate(-3deg)}}
 .streak-info{flex:1}
-.streak-number{font-family:var(--font-display);font-size:3rem;font-weight:700;color:var(--accent);line-height:1}
-.streak-label{font-size:.85rem;color:var(--text2);margin-top:2px}
-.streak-best{font-size:.8rem;color:var(--text3);margin-top:4px}
-.streak-milestones{display:flex;gap:8px;margin-left:auto}
-.milestone{
-  width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;
-  font-size:.75rem;font-weight:700;border:2px solid var(--border);color:var(--text3);
-}
+.streak-number{font-family:var(--font-display);font-size:2.8rem;font-weight:700;color:var(--accent);line-height:1}
+.streak-label{font-size:.82rem;color:var(--text2);margin-top:2px}
+.streak-best{font-size:.75rem;color:var(--text3);margin-top:3px}
+.streak-milestones{display:flex;gap:6px;margin-left:auto}
+.milestone{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;border:2px solid var(--border);color:var(--text3)}
 .milestone.reached{border-color:var(--accent);color:var(--accent);background:var(--accent-glow)}
 
-/* ─── Date/Week Nav ─── */
-.date-nav{display:flex;align-items:center;gap:12px;margin-bottom:24px;flex-wrap:wrap}
-.nav-btn{
-  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);
-  color:var(--text2);padding:9px 16px;cursor:pointer;font-size:.85rem;font-weight:500;
-  transition:var(--transition);font-family:var(--font-body);
-}
+.date-nav{display:flex;align-items:center;gap:10px;margin-bottom:20px;flex-wrap:wrap}
+.nav-btn{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text2);padding:8px 14px;cursor:pointer;font-size:.82rem;font-weight:500;transition:var(--transition);font-family:var(--font-body)}
 .nav-btn:hover{border-color:var(--accent);color:var(--accent)}
-.nav-btn.primary{background:var(--accent-glow);border-color:rgba(139,130,240,.3);color:var(--accent)}
-.date-label{font-family:var(--font-display);font-size:1.4rem;font-weight:600;min-width:180px;text-align:center}
+.nav-btn.primary{background:var(--accent-glow);border-color:rgba(var(--accent-rgb),.3);color:var(--accent)}
+.date-label{font-family:var(--font-display);font-size:1.3rem;font-weight:600;min-width:180px;text-align:center}
 
-/* ─── Category Progress ─── */
-.cat-progress-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;margin-bottom:24px}
-.cat-progress{
-  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;
-}
-.cat-progress-name{font-size:.75rem;text-transform:uppercase;letter-spacing:.8px;color:var(--text3);font-weight:600;margin-bottom:8px}
-.cat-progress-bar{height:4px;border-radius:2px;background:var(--surface2);overflow:hidden}
+.cat-progress-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-bottom:20px}
+.cat-progress{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px}
+.cat-progress-name{font-size:.7rem;text-transform:uppercase;letter-spacing:.8px;color:var(--text3);font-weight:600;margin-bottom:6px}
+.cat-progress-bar{height:3px;border-radius:2px;background:var(--surface2);overflow:hidden}
 .cat-progress-fill{height:100%;border-radius:2px;transition:width .4s ease}
-.cat-progress-pct{font-family:var(--font-display);font-size:1.3rem;font-weight:700;margin-top:6px}
+.cat-progress-pct{font-family:var(--font-display);font-size:1.2rem;font-weight:700;margin-top:4px}
 
-/* ─── Habits ─── */
-.category-section{margin-bottom:20px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
-.category-header{
-  padding:14px 18px;display:flex;align-items:center;justify-content:space-between;
-  border-bottom:1px solid var(--border);
-}
-.category-title{font-size:.8rem;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--text2)}
-.category-count{font-size:.8rem;color:var(--text3)}
-.habit-row{
-  display:flex;align-items:center;gap:14px;padding:12px 18px;
-  transition:var(--transition);border-bottom:1px solid rgba(34,34,48,.5);
-}
+.category-section{margin-bottom:16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.category-header{padding:12px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border)}
+.category-title{font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--text2)}
+.category-count{font-size:.75rem;color:var(--text3)}
+.habit-row{display:flex;align-items:center;gap:12px;padding:10px 16px;transition:var(--transition);border-bottom:1px solid rgba(31,31,48,.4)}
 .habit-row:last-child{border-bottom:none}
 .habit-row:hover{background:var(--surface2)}
-.habit-check{
-  appearance:none;width:24px;height:24px;border:2px solid var(--border2);border-radius:8px;
-  cursor:pointer;flex-shrink:0;position:relative;transition:var(--transition);background:transparent;
-}
+.habit-check{appearance:none;width:22px;height:22px;border:2px solid var(--border2);border-radius:7px;cursor:pointer;flex-shrink:0;position:relative;transition:var(--transition);background:transparent}
 .habit-check:hover{border-color:var(--accent)}
 .habit-check:checked{background:var(--accent);border-color:var(--accent)}
-.habit-check:checked::after{
-  content:'';position:absolute;left:7px;top:3px;width:6px;height:11px;
-  border:solid #fff;border-width:0 2.5px 2.5px 0;transform:rotate(45deg);
-}
-.habit-label{font-size:.9rem;flex:1;color:var(--text)}
-.habit-input{
-  background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-xs);
-  color:var(--text);padding:8px 12px;font-size:.85rem;font-family:var(--font-body);width:180px;
-  transition:var(--transition);
-}
+.habit-check:checked::after{content:'';position:absolute;left:6px;top:2px;width:5px;height:10px;border:solid #fff;border-width:0 2px 2px 0;transform:rotate(45deg)}
+.habit-label{font-size:.85rem;flex:1;color:var(--text)}
+.habit-input{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-xs);color:var(--text);padding:7px 10px;font-size:.82rem;font-family:var(--font-body);width:160px;transition:var(--transition)}
 .habit-input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-glow)}
+.habit-input.filled{border-color:rgba(var(--accent-rgb),.4)}
+.habit-input-wide{width:240px}
+.habit-badge{font-size:.7rem;color:var(--text3);background:var(--surface2);padding:2px 8px;border-radius:var(--radius-xs);white-space:nowrap}
 
-/* ─── Score Sliders ─── */
-.score-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:14px;margin-bottom:24px}
-.score-item{
-  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px 22px;
-  transition:var(--transition);
-}
-.score-item:hover{border-color:var(--border2)}
-.score-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
-.score-domain{font-weight:600;font-size:.95rem;display:flex;align-items:center;gap:8px}
-.score-emoji{font-size:1.1rem}
-.score-value{font-family:var(--font-display);font-size:2rem;font-weight:700;color:var(--accent);line-height:1}
-.score-slider{width:100%;appearance:none;height:6px;border-radius:3px;background:var(--surface2);outline:none;cursor:pointer}
-.score-slider::-webkit-slider-thumb{appearance:none;width:22px;height:22px;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 0 10px var(--accent-glow);transition:var(--transition)}
-.score-slider::-webkit-slider-thumb:hover{transform:scale(1.15);box-shadow:0 0 16px rgba(139,130,240,.4)}
-.score-slider::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:var(--accent);border:none;cursor:pointer}
-
-/* ─── Tabs ─── */
-.tab-bar{display:flex;gap:4px;margin-bottom:24px;background:var(--surface);border-radius:var(--radius-sm);padding:4px;width:fit-content;border:1px solid var(--border)}
-.tab-btn{
-  padding:9px 22px;border-radius:var(--radius-xs);border:none;background:none;color:var(--text2);
-  font-size:.85rem;font-weight:500;cursor:pointer;transition:var(--transition);font-family:var(--font-body);
-}
+.tab-bar{display:flex;gap:4px;margin-bottom:20px;background:var(--surface);border-radius:var(--radius-sm);padding:4px;width:fit-content;border:1px solid var(--border)}
+.tab-btn{padding:8px 18px;border-radius:var(--radius-xs);border:none;background:none;color:var(--text2);font-size:.82rem;font-weight:500;cursor:pointer;transition:var(--transition);font-family:var(--font-body)}
 .tab-btn.active{background:var(--accent);color:#fff}
 
-/* ─── Save Button ─── */
-.save-btn{
-  background:var(--accent);color:#fff;border:none;border-radius:var(--radius-sm);
-  padding:13px 36px;font-size:.95rem;font-weight:600;cursor:pointer;transition:var(--transition);
-  font-family:var(--font-body);position:relative;overflow:hidden;
-}
-.save-btn:hover{background:var(--accent2);transform:translateY(-1px);box-shadow:0 4px 20px rgba(139,130,240,.3)}
+.save-btn{background:var(--accent);color:#fff;border:none;border-radius:var(--radius-sm);padding:12px 32px;font-size:.9rem;font-weight:600;cursor:pointer;transition:var(--transition);font-family:var(--font-body)}
+.save-btn:hover{background:var(--accent2);transform:translateY(-1px);box-shadow:0 4px 20px rgba(var(--accent-rgb),.3)}
 .save-btn:active{transform:translateY(0)}
 
-/* ─── Chart ─── */
-.chart-container{
-  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
-  padding:24px;margin-bottom:24px;overflow-x:auto;
-}
-.chart-container canvas{width:100%!important;max-height:400px}
+.score-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px;margin-bottom:20px}
+.score-item{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 20px;transition:var(--transition)}
+.score-item:hover{border-color:var(--border2)}
+.score-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.score-domain{font-weight:600;font-size:.9rem;display:flex;align-items:center;gap:8px}
+.score-value{font-family:var(--font-display);font-size:1.8rem;font-weight:700;color:var(--accent);line-height:1}
+.score-slider{width:100%;appearance:none;height:5px;border-radius:3px;background:var(--surface2);outline:none;cursor:pointer}
+.score-slider::-webkit-slider-thumb{appearance:none;width:20px;height:20px;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 0 8px var(--accent-glow)}
+.score-slider::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:var(--accent);border:none;cursor:pointer}
 
-/* ─── Deltas ─── */
-.delta-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-bottom:24px}
-.delta-item{
-  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);
-  padding:14px 16px;display:flex;justify-content:space-between;align-items:center;
-}
-.delta-domain{font-size:.85rem;font-weight:500;display:flex;align-items:center;gap:6px}
-.delta-value{font-family:var(--font-display);font-size:1.3rem;font-weight:700}
-.delta-up{color:var(--green)}
-.delta-down{color:var(--red)}
-.delta-flat{color:var(--text3)}
-.delta-arrow{font-size:.7rem}
+.chart-container{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:20px;overflow-x:auto}
+.chart-container canvas{width:100%!important;max-height:360px}
+.delta-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px;margin-bottom:20px}
+.delta-item{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;display:flex;justify-content:space-between;align-items:center}
+.delta-domain{font-size:.82rem;font-weight:500;display:flex;align-items:center;gap:6px}
+.delta-value{font-family:var(--font-display);font-size:1.2rem;font-weight:700}
+.delta-up{color:var(--green)}.delta-down{color:var(--red)}.delta-flat{color:var(--text3)}
 
-/* ─── Weekly Completion Chart ─── */
-.completion-chart-wrap{
-  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
-  padding:20px;margin-bottom:28px;
-}
-.completion-chart-title{font-size:.95rem;font-weight:600;margin-bottom:16px}
-.completion-bars{display:flex;align-items:flex-end;gap:8px;height:120px;padding-top:8px}
-.completion-bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;height:100%}
-.completion-bar{
-  width:100%;border-radius:4px 4px 0 0;background:var(--accent);opacity:.7;transition:height .4s ease;
-  min-height:2px;margin-top:auto;
-}
-.completion-bar.today{opacity:1;box-shadow:0 0 12px var(--accent-glow)}
-.completion-bar-label{font-size:.7rem;color:var(--text3);font-weight:500}
-.completion-bar-pct{font-size:.7rem;color:var(--text2);font-weight:600}
+.completion-chart-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px;margin-bottom:24px}
+.completion-chart-title{font-size:.9rem;font-weight:600;margin-bottom:14px}
+.completion-bars{display:flex;align-items:flex-end;gap:6px;height:110px;padding-top:8px}
+.completion-bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;height:100%}
+.completion-bar{width:100%;border-radius:3px 3px 0 0;background:var(--accent);opacity:.65;transition:height .4s ease;min-height:2px;margin-top:auto}
+.completion-bar.today{opacity:1;box-shadow:0 0 10px var(--accent-glow)}
+.completion-bar-label{font-size:.65rem;color:var(--text3);font-weight:500}
+.completion-bar-pct{font-size:.65rem;color:var(--text2);font-weight:600}
 
-/* ─── Responsive ─── */
+/* Overview section */
+.overview-section{margin-bottom:24px}
+.overview-title{font-size:.95rem;font-weight:600;margin-bottom:14px}
+.month-cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:16px}
+.month-cal-head{font-size:.65rem;color:var(--text3);text-align:center;padding:4px;font-weight:600}
+.month-cal-day{aspect-ratio:1;border-radius:var(--radius-xs);display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:500;position:relative;cursor:default;transition:var(--transition)}
+.month-cal-day.empty{background:transparent}
+.month-cal-day.logged{background:var(--surface2)}
+.month-cal-day.today-cell{border:1px solid var(--accent)}
+.month-cal-day .day-num{z-index:1}
+.month-cal-day .day-fill{position:absolute;inset:2px;border-radius:4px;opacity:.6}
+.month-bar-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(60px,1fr));gap:6px}
+.month-bar-item{text-align:center}
+.month-bar-track{height:60px;background:var(--surface2);border-radius:4px;overflow:hidden;display:flex;align-items:flex-end}
+.month-bar-fill{width:100%;border-radius:4px 4px 0 0;background:var(--accent);transition:height .4s ease}
+.month-bar-label{font-size:.65rem;color:var(--text3);margin-top:4px}
+.month-bar-pct{font-size:.7rem;color:var(--text2);font-weight:600;margin-top:2px}
+
 @media(max-width:768px){
-  .sidebar{transform:translateX(-100%)}
-  .sidebar.open{transform:translateX(0)}
-  .hamburger{display:block}
-  .overlay.open{display:block}
-  .main{margin-left:0;padding:16px;padding-top:56px}
+  .sidebar{transform:translateX(-100%)}.sidebar.open{transform:translateX(0)}.hamburger{display:block}.overlay.open{display:block}
+  .main{margin-left:0;padding:14px;padding-top:54px}
   .hero-stats{grid-template-columns:repeat(2,1fr)}
-  .cards-grid{grid-template-columns:1fr}
-  .score-grid{grid-template-columns:1fr}
-  .info-grid{grid-template-columns:1fr}
+  .cards-grid,.score-grid,.info-grid{grid-template-columns:1fr}
   .cat-progress-grid{grid-template-columns:repeat(2,1fr)}
   .streak-milestones{display:none}
   .date-label{min-width:auto;font-size:1.1rem}
-  .completion-bars{gap:4px}
+  .completion-bars{gap:3px}
+  .habit-input-wide{width:160px}
 }
-@media(max-width:480px){
-  .hero-stats{grid-template-columns:1fr 1fr}
-  .cat-progress-grid{grid-template-columns:1fr}
-}
+@media(max-width:480px){.hero-stats{grid-template-columns:1fr 1fr}.cat-progress-grid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
-
-<!-- Toast -->
 <div class="toast" id="toast"></div>
-<!-- Heatmap Tooltip -->
 <div class="heatmap-tooltip" id="heatmapTooltip"></div>
-
-<!-- Hamburger -->
-<button class="hamburger" onclick="toggleSidebar()" aria-label="Menu">
-  <span></span><span></span><span></span>
-</button>
+<button class="hamburger" onclick="toggleSidebar()" aria-label="Menu"><span></span><span></span><span></span></button>
 <div class="overlay" onclick="toggleSidebar()"></div>
 
-<!-- Sidebar -->
 <nav class="sidebar">
   <div class="sidebar-brand">LifeOS</div>
   <div class="sidebar-tagline">Discipline drives destiny.</div>
-
   <div class="nav-section">Navigate</div>
   <button class="nav-link active" onclick="showPage('dashboard',this)">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-    Dashboard
-  </button>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Dashboard</button>
   <button class="nav-link" onclick="showPage('disciplines',this)">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
-    Daily Disciplines
-  </button>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>Daily Disciplines</button>
   <button class="nav-link" onclick="showPage('scores',this)">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
-    Weekly Scores
-  </button>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>Weekly Scores</button>
   <button class="nav-link" onclick="showPage('insights',this)">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-    Insights
-  </button>
-
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>Insights</button>
   <div class="sidebar-footer">
-    <div class="sync-status">
-      <span class="sync-dot" id="syncDot"></span>
-      <span id="syncLabel">Checking...</span>
-    </div>
-    <div class="sidebar-version">LifeOS v2.0</div>
+    <div class="sync-status"><span class="sync-dot" id="syncDot"></span><span id="syncLabel">Checking...</span></div>
+    <div class="sidebar-version">LifeOS v3.0</div>
   </div>
 </nav>
 
-<!-- Main -->
 <div class="main">
 
-<!-- ══════════════════ DASHBOARD ══════════════════ -->
+<!-- ══════════ DASHBOARD ══════════ -->
 <div class="page active" id="page-dashboard">
   <div class="page-header">
-    <div>
-      <h1 class="page-title">Dashboard</h1>
-      <p class="page-subtitle" id="dashGreeting"></p>
-    </div>
-    <div class="progress-ring-wrap" style="width:90px;height:90px">
-      <svg class="progress-ring" width="90" height="90">
-        <circle class="progress-ring-bg" cx="45" cy="45" r="38"/>
-        <circle class="progress-ring-fill" id="dashRingFill" cx="45" cy="45" r="38" stroke-dasharray="238.76" stroke-dashoffset="238.76"/>
-      </svg>
-      <span class="progress-ring-text" id="dashRingPct">0%</span>
-      <span class="progress-ring-label">Today</span>
+    <div><h1 class="page-title">Dashboard</h1><p class="page-subtitle" id="dashGreeting"></p></div>
+    <div class="progress-ring-wrap" style="width:86px;height:86px">
+      <svg class="progress-ring" width="86" height="86"><circle class="progress-ring-bg" cx="43" cy="43" r="36"/><circle class="progress-ring-fill" id="dashRingFill" cx="43" cy="43" r="36" stroke-dasharray="226.19" stroke-dashoffset="226.19"/></svg>
+      <span class="progress-ring-text" id="dashRingPct">0%</span><span class="progress-ring-label">Today</span>
     </div>
   </div>
-
-  <div class="hero-stats" id="heroStats">
-    <div class="hero-stat">
-      <div class="hero-stat-label">Current Streak</div>
-      <div class="hero-stat-value" id="dashStreak">0</div>
-      <div class="hero-stat-sub">days</div>
-    </div>
-    <div class="hero-stat">
-      <div class="hero-stat-label">Best Streak</div>
-      <div class="hero-stat-value" id="dashBestStreak">0</div>
-      <div class="hero-stat-sub">days</div>
-    </div>
-    <div class="hero-stat">
-      <div class="hero-stat-label">This Week Avg</div>
-      <div class="hero-stat-value" id="dashWeekAvg">0%</div>
-      <div class="hero-stat-sub">completion</div>
-    </div>
-    <div class="hero-stat">
-      <div class="hero-stat-label">Total Days Logged</div>
-      <div class="hero-stat-value" id="dashTotalDays">0</div>
-      <div class="hero-stat-sub">entries</div>
-    </div>
+  <div class="hero-stats">
+    <div class="hero-stat"><div class="hero-stat-label">Current Streak</div><div class="hero-stat-value" id="dashStreak">0</div><div class="hero-stat-sub">days</div></div>
+    <div class="hero-stat"><div class="hero-stat-label">Best Streak</div><div class="hero-stat-value" id="dashBestStreak">0</div><div class="hero-stat-sub">days</div></div>
+    <div class="hero-stat"><div class="hero-stat-label">This Week Avg</div><div class="hero-stat-value" id="dashWeekAvg">0%</div><div class="hero-stat-sub">completion</div></div>
+    <div class="hero-stat"><div class="hero-stat-label">Days Logged</div><div class="hero-stat-value" id="dashTotalDays">0</div><div class="hero-stat-sub">entries</div></div>
   </div>
-
-  <!-- Heatmap -->
+  <div class="hero-stats" style="grid-template-columns:repeat(2,1fr);margin-bottom:24px">
+    <div class="hero-stat"><div class="hero-stat-label">Most Common Mass Time</div><div class="hero-stat-value" id="dashMassMode" style="font-size:1.6rem">-</div><div class="hero-stat-sub">mode across all entries</div></div>
+    <div class="hero-stat"><div class="hero-stat-label">Avg Adoration Duration</div><div class="hero-stat-value" id="dashAdorationAvg" style="font-size:1.6rem">-</div><div class="hero-stat-sub">minutes per visit</div></div>
+  </div>
   <div class="heatmap-wrap">
-    <div class="heatmap-title"><span>Discipline Heatmap</span> <span style="font-size:.75rem;color:var(--text3);font-weight:400;margin-left:auto">Last 16 weeks</span></div>
-    <div class="heatmap-months" id="heatmapMonths"></div>
+    <div class="heatmap-title"><span>Discipline Heatmap</span><span style="font-size:.7rem;color:var(--text3);font-weight:400;margin-left:auto">Last 16 weeks</span></div>
     <div class="heatmap" id="heatmap"></div>
-    <div class="heatmap-legend">
-      <span>Less</span>
-      <span style="background:var(--surface2)"></span>
-      <span style="background:rgba(139,130,240,.2)"></span>
-      <span style="background:rgba(139,130,240,.4)"></span>
-      <span style="background:rgba(139,130,240,.6)"></span>
-      <span style="background:var(--accent)"></span>
-      <span>More</span>
-    </div>
+    <div class="heatmap-legend"><span>Less</span><span style="background:var(--surface2)"></span><span style="background:rgba(var(--accent-rgb),.2)"></span><span style="background:rgba(var(--accent-rgb),.4)"></span><span style="background:rgba(var(--accent-rgb),.65)"></span><span style="background:var(--accent)"></span><span>More</span></div>
   </div>
-
-  <!-- Last 7 Days Completion -->
-  <div class="completion-chart-wrap">
-    <div class="completion-chart-title">Last 7 Days</div>
-    <div class="completion-bars" id="completionBars"></div>
-  </div>
-
-  <!-- Domain Cards -->
+  <div class="completion-chart-wrap"><div class="completion-chart-title">Last 7 Days</div><div class="completion-bars" id="completionBars"></div></div>
   <div class="cards-grid" id="dashboardCards"></div>
-
-  <!-- Info Grid -->
   <div class="info-grid">
-    <div class="info-box">
-      <h3><span class="info-icon">&#9650;</span> Priority Stack</h3>
-      <ul>
-        <li>Faith — non-negotiable foundation</li>
-        <li>Health — energy for everything else</li>
-        <li>Career — Validation/CQV move</li>
-        <li>Ministry — leadership and service</li>
-        <li>GridNodes — automation side business</li>
-        <li>Finance — freedom and generosity</li>
-        <li>Relationships — community and connection</li>
-        <li>Family — roots and belonging</li>
-      </ul>
-    </div>
-    <div class="info-box">
-      <h3><span class="info-icon">&#9733;</span> Ministry Roles</h3>
-      <ul>
-        <li>Jesus Youth Music Coordinator — Ireland</li>
-        <li>Nightfever Coordinator — Dublin</li>
-        <li>Emmaus — active member</li>
-        <li>Global2033 — contributor</li>
-      </ul>
-    </div>
-    <div class="info-box">
-      <h3><span class="info-icon">&#8599;</span> Career Tracks</h3>
-      <ul>
-        <li>Primary: Validation / CQV Engineering</li>
-        <li>Secondary: AI Automation (GridNodes)</li>
-      </ul>
-    </div>
-    <div class="info-box blocker-box">
-      <h3><span class="info-icon">&#9888;</span> Core Blocker</h3>
-      <ul>
-        <li>Discipline consistency — the gap between intention and execution</li>
-        <li>Track daily. Score weekly. Adjust monthly. Stay honest.</li>
-      </ul>
-    </div>
+    <div class="info-box"><h3><span class="info-icon">&#9650;</span> Priority Stack</h3><ul><li>Faith — non-negotiable foundation</li><li>Health — energy for everything else</li><li>Career — Validation/CQV move</li><li>Ministry — leadership and service</li><li>GridNodes — automation side business</li><li>Finance — freedom and generosity</li><li>Relationships — community and connection</li><li>Family — roots and belonging</li></ul></div>
+    <div class="info-box"><h3><span class="info-icon">&#9733;</span> Ministry Roles</h3><ul><li>Jesus Youth Music Coordinator — Ireland</li><li>Nightfever Coordinator — Dublin</li><li>Emmaus — active member</li><li>Global2033 — contributor</li></ul></div>
+    <div class="info-box"><h3><span class="info-icon">&#8599;</span> Career Tracks</h3><ul><li>Primary: Validation / CQV Engineering</li><li>Secondary: AI Automation (GridNodes)</li></ul></div>
+    <div class="info-box blocker-box"><h3><span class="info-icon">&#9888;</span> Core Blocker</h3><ul><li>Discipline consistency — the gap between intention and execution</li><li>Track daily. Score weekly. Adjust monthly. Stay honest.</li></ul></div>
   </div>
 </div>
 
-<!-- ══════════════════ DAILY DISCIPLINES ══════════════════ -->
+<!-- ══════════ DAILY DISCIPLINES ══════════ -->
 <div class="page" id="page-disciplines">
-  <div class="page-header">
-    <div>
-      <h1 class="page-title">Daily Disciplines</h1>
-      <p class="page-subtitle">19 habits. No excuses.</p>
-    </div>
-  </div>
-
-  <!-- Streak -->
+  <div class="page-header"><div><h1 class="page-title">Daily Disciplines</h1><p class="page-subtitle">Every field counts. Fill it all in.</p></div></div>
   <div class="streak-display">
     <div class="streak-flame" id="streakFlame">&#128293;</div>
-    <div class="streak-info">
-      <div class="streak-number" id="streakCount">0</div>
-      <div class="streak-label">day streak</div>
-      <div class="streak-best">Best: <span id="bestStreakCount">0</span> days</div>
-    </div>
+    <div class="streak-info"><div class="streak-number" id="streakCount">0</div><div class="streak-label">day streak</div><div class="streak-best">Best: <span id="bestStreakCount">0</span> days</div></div>
     <div class="streak-milestones" id="streakMilestones"></div>
   </div>
-
-  <!-- Date Nav -->
-  <div class="date-nav">
-    <button class="nav-btn" onclick="changeDate(-1)">&larr; Prev</button>
-    <div class="date-label" id="dateLabel"></div>
-    <button class="nav-btn" onclick="changeDate(1)">Next &rarr;</button>
-    <button class="nav-btn primary" onclick="goToday()" style="margin-left:auto">Today</button>
+  <div class="tab-bar" style="margin-bottom:20px">
+    <button class="tab-btn active" onclick="showDisciplineTab('today',this)">Today</button>
+    <button class="tab-btn" onclick="showDisciplineTab('month',this)">This Month</button>
+    <button class="tab-btn" onclick="showDisciplineTab('year',this)">This Year</button>
+    <button class="tab-btn" onclick="showDisciplineTab('alltime',this)">All Time</button>
   </div>
-
-  <!-- Category Progress -->
-  <div class="cat-progress-grid" id="catProgressGrid"></div>
-
-  <!-- Habits -->
-  <div id="habitsContainer"></div>
-
-  <div style="margin-top:24px;display:flex;gap:12px;align-items:center">
-    <button class="save-btn" onclick="saveDisciplines()">Save Entry</button>
-    <span style="font-size:.8rem;color:var(--text3)" id="lastSaved"></span>
-  </div>
-</div>
-
-<!-- ══════════════════ WEEKLY SCORES ══════════════════ -->
-<div class="page" id="page-scores">
-  <div class="page-header">
-    <div>
-      <h1 class="page-title">Weekly Scores</h1>
-      <p class="page-subtitle">Rate each life domain 1-10</p>
+  <div id="discToday">
+    <div class="date-nav">
+      <button class="nav-btn" onclick="changeDate(-1)">&larr;</button>
+      <div class="date-label" id="dateLabel"></div>
+      <button class="nav-btn" onclick="changeDate(1)">&rarr;</button>
+      <button class="nav-btn primary" onclick="goToday()" style="margin-left:auto">Today</button>
+    </div>
+    <div class="cat-progress-grid" id="catProgressGrid"></div>
+    <div id="habitsContainer"></div>
+    <div style="margin-top:20px;display:flex;gap:12px;align-items:center">
+      <button class="save-btn" onclick="saveDisciplines()">Save Entry</button>
+      <span style="font-size:.75rem;color:var(--text3)" id="lastSaved"></span>
     </div>
   </div>
+  <div id="discMonth" style="display:none"></div>
+  <div id="discYear" style="display:none"></div>
+  <div id="discAlltime" style="display:none"></div>
+</div>
 
-  <div class="date-nav" style="margin-bottom:20px">
-    <button class="nav-btn" onclick="changeWeek(-1)">&larr; Prev</button>
-    <div class="date-label" id="weekLabel" style="min-width:140px"></div>
-    <button class="nav-btn" onclick="changeWeek(1)">Next &rarr;</button>
+<!-- ══════════ WEEKLY SCORES ══════════ -->
+<div class="page" id="page-scores">
+  <div class="page-header"><div><h1 class="page-title">Weekly Scores</h1><p class="page-subtitle">Rate each life domain 1-10</p></div></div>
+  <div class="date-nav" style="margin-bottom:16px">
+    <button class="nav-btn" onclick="changeWeek(-1)">&larr;</button>
+    <div class="date-label" id="weekLabel" style="min-width:130px"></div>
+    <button class="nav-btn" onclick="changeWeek(1)">&rarr;</button>
     <button class="nav-btn primary" onclick="goCurrentWeek()" style="margin-left:auto">This Week</button>
   </div>
-
-  <div class="tab-bar">
-    <button class="tab-btn active" onclick="showScoreTab('entry',this)">Entry</button>
-    <button class="tab-btn" onclick="showScoreTab('trends',this)">Trends</button>
-  </div>
-
-  <div id="scoreEntry">
-    <div class="score-grid" id="scoreGrid"></div>
-    <button class="save-btn" onclick="saveScores()">Save Scores</button>
-  </div>
-
-  <div id="scoreTrends" style="display:none">
-    <div class="chart-container">
-      <canvas id="trendsChart"></canvas>
-    </div>
-    <h3 style="font-size:.95rem;font-weight:600;margin-bottom:14px;color:var(--text2)">Week-on-Week Delta</h3>
-    <div class="delta-grid" id="deltaGrid"></div>
-  </div>
+  <div class="tab-bar"><button class="tab-btn active" onclick="showScoreTab('entry',this)">Entry</button><button class="tab-btn" onclick="showScoreTab('trends',this)">Trends</button></div>
+  <div id="scoreEntry"><div class="score-grid" id="scoreGrid"></div><button class="save-btn" onclick="saveScores()">Save Scores</button></div>
+  <div id="scoreTrends" style="display:none"><div class="chart-container"><canvas id="trendsChart"></canvas></div><h3 style="font-size:.9rem;font-weight:600;margin-bottom:12px;color:var(--text2)">Week-on-Week Delta</h3><div class="delta-grid" id="deltaGrid"></div></div>
 </div>
 
-<!-- ══════════════════ INSIGHTS ══════════════════ -->
+<!-- ══════════ INSIGHTS ══════════ -->
 <div class="page" id="page-insights">
-  <div class="page-header">
-    <div>
-      <h1 class="page-title">Insights</h1>
-      <p class="page-subtitle">Patterns and progress over time</p>
-    </div>
-  </div>
-
-  <div class="chart-container">
-    <div style="font-size:.95rem;font-weight:600;margin-bottom:16px">Daily Completion Trend (Last 30 Days)</div>
-    <canvas id="completionTrendChart"></canvas>
-  </div>
-
-  <div class="chart-container">
-    <div style="font-size:.95rem;font-weight:600;margin-bottom:16px">Category Breakdown (This Week)</div>
-    <canvas id="categoryRadarChart"></canvas>
-  </div>
-
+  <div class="page-header"><div><h1 class="page-title">Insights</h1><p class="page-subtitle">Patterns and progress over time</p></div></div>
+  <div class="chart-container"><div style="font-size:.9rem;font-weight:600;margin-bottom:14px">Daily Completion (Last 30 Days)</div><canvas id="completionTrendChart"></canvas></div>
+  <div class="chart-container"><div style="font-size:.9rem;font-weight:600;margin-bottom:14px">Category Breakdown (This Week)</div><canvas id="categoryRadarChart"></canvas></div>
   <div class="hero-stats" style="grid-template-columns:repeat(3,1fr)">
-    <div class="hero-stat">
-      <div class="hero-stat-label">Most Consistent Habit</div>
-      <div class="hero-stat-value" id="insightBestHabit" style="font-size:1.4rem">-</div>
-    </div>
-    <div class="hero-stat">
-      <div class="hero-stat-label">Most Missed Habit</div>
-      <div class="hero-stat-value" id="insightWorstHabit" style="font-size:1.4rem;color:var(--red)">-</div>
-    </div>
-    <div class="hero-stat">
-      <div class="hero-stat-label">30-Day Average</div>
-      <div class="hero-stat-value" id="insight30Avg">0%</div>
-    </div>
+    <div class="hero-stat"><div class="hero-stat-label">Most Consistent</div><div class="hero-stat-value" id="insightBestHabit" style="font-size:1.3rem">-</div></div>
+    <div class="hero-stat"><div class="hero-stat-label">Most Missed</div><div class="hero-stat-value" id="insightWorstHabit" style="font-size:1.3rem;color:var(--red)">-</div></div>
+    <div class="hero-stat"><div class="hero-stat-label">30-Day Average</div><div class="hero-stat-value" id="insight30Avg">0%</div></div>
   </div>
 </div>
 
-</div><!-- /main -->
+</div>
 
 <script>
-(function(){
-  const C=document.createElement('script');
-  C.src='https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js';
-  C.onload=()=>{chartsReady=true;renderAllCharts()};
-  document.head.appendChild(C);
-})();
+(function(){const C=document.createElement('script');C.src='https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js';C.onload=()=>{chartsReady=true;renderAllCharts()};document.head.appendChild(C)})();
 </script>
-
 <script>
-// ─── Config ─────────────────────────────────────────────────
-const SUPABASE_URL = 'https://vjumuvdzrerxoxpjcfwl.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_ZDZTWno-Wg4ip3_PqKMl0Q_7DjwWfDQ';
-const SB_HEADERS = {
-  'apikey': SUPABASE_KEY,
-  'Authorization': 'Bearer ' + SUPABASE_KEY,
-  'Content-Type': 'application/json',
-  'Prefer': 'return=minimal'
-};
+const SUPABASE_URL='https://vjumuvdzrerxoxpjcfwl.supabase.co';
+const SUPABASE_KEY='sb_publishable_ZDZTWno-Wg4ip3_PqKMl0Q_7DjwWfDQ';
+const SB_HEADERS={'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY,'Content-Type':'application/json','Prefer':'return=minimal'};
+let chartsReady=false;
 
-let chartsReady = false;
-
-// ─── Supabase fetch ─────────────────────────────────────────
-async function sbFetch(table, method, body, query) {
-  const url = `${SUPABASE_URL}/rest/v1/${table}${query || ''}`;
-  try {
-    const hdrs = { ...SB_HEADERS };
-    if (method !== 'GET') hdrs['Prefer'] = 'resolution=merge-duplicates,return=minimal';
-    const opts = { method, headers: hdrs };
-    if (body) opts.body = JSON.stringify(body);
-    const r = await fetch(url, opts);
-    if (!r.ok) throw new Error(r.status);
-    updateSyncStatus('synced');
-    return method === 'GET' ? r.json() : true;
-  } catch {
-    updateSyncStatus('offline');
-    return null;
-  }
+async function sbFetch(table,method,body,query){
+  const url=`${SUPABASE_URL}/rest/v1/${table}${query||''}`;
+  try{
+    const hdrs={...SB_HEADERS};if(method!=='GET')hdrs['Prefer']='resolution=merge-duplicates,return=minimal';
+    const opts={method,headers:hdrs};if(body)opts.body=JSON.stringify(body);
+    const r=await fetch(url,opts);if(!r.ok)throw new Error(r.status);
+    updateSyncStatus('synced');return method==='GET'?r.json():true;
+  }catch{updateSyncStatus('offline');return null}
 }
+function updateSyncStatus(s){const d=document.getElementById('syncDot'),l=document.getElementById('syncLabel');d.className='sync-dot';if(s==='synced')l.textContent='Synced';else if(s==='saving'){d.classList.add('saving');l.textContent='Saving...'}else{d.classList.add('offline');l.textContent='Local only'}}
+function toast(m,t){const e=document.getElementById('toast');e.textContent=m;e.className='toast '+(t||'');setTimeout(()=>e.classList.add('show'),10);setTimeout(()=>e.classList.remove('show'),2500)}
+function lsGet(k){try{return JSON.parse(localStorage.getItem(k))||{}}catch{return{}}}
+function lsSet(k,v){localStorage.setItem(k,JSON.stringify(v))}
 
-function updateSyncStatus(state) {
-  const dot = document.getElementById('syncDot');
-  const label = document.getElementById('syncLabel');
-  dot.className = 'sync-dot';
-  if (state === 'synced') { label.textContent = 'Synced'; }
-  else if (state === 'saving') { dot.classList.add('saving'); label.textContent = 'Saving...'; }
-  else { dot.classList.add('offline'); label.textContent = 'Local only'; }
+function showPage(id,btn){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  document.querySelectorAll('.nav-link').forEach(n=>n.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  if(id==='dashboard')renderDashboard();
+  if(id==='disciplines')renderDisciplines();
+  if(id==='scores'){renderScoreSliders();renderAllCharts()}
+  if(id==='insights')renderInsights();
+  if(window.innerWidth<=768)toggleSidebar();
 }
+function toggleSidebar(){document.querySelector('.sidebar').classList.toggle('open');document.querySelector('.overlay').classList.toggle('open')}
 
-function toast(msg, type) {
-  const el = document.getElementById('toast');
-  el.textContent = msg;
-  el.className = 'toast ' + (type || '');
-  setTimeout(() => el.classList.add('show'), 10);
-  setTimeout(() => el.classList.remove('show'), 2500);
-}
-
-// ─── Storage ────────────────────────────────────────────────
-function lsGet(key) { try { return JSON.parse(localStorage.getItem(key)) || {}; } catch { return {}; } }
-function lsSet(key, val) { localStorage.setItem(key, JSON.stringify(val)); }
-
-// ─── Navigation ─────────────────────────────────────────────
-function showPage(id, btn) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.getElementById('page-' + id).classList.add('active');
-  document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
-  if (btn) btn.classList.add('active');
-  if (id === 'dashboard') renderDashboard();
-  if (id === 'disciplines') renderDisciplines();
-  if (id === 'scores') { renderScoreSliders(); renderAllCharts(); }
-  if (id === 'insights') renderInsights();
-  if (window.innerWidth <= 768) toggleSidebar();
-}
-
-function toggleSidebar() {
-  document.querySelector('.sidebar').classList.toggle('open');
-  document.querySelector('.overlay').classList.toggle('open');
-}
-
-// ─── Data ───────────────────────────────────────────────────
-const CATS = [
-  { name: 'Spiritual', color: '#8b82f0', habits: [
-    { id: 'mass', label: 'Mass', type: 'check' },
-    { id: 'rosary', label: 'Rosary', type: 'check' },
-    { id: 'adoration', label: 'Adoration', type: 'check' },
-    { id: 'dmc', label: 'DMC', type: 'check' },
-    { id: 'bible', label: 'Bible reading', type: 'check' },
-    { id: 'prayer', label: 'Personal prayer', type: 'check' },
-    { id: 'jy_ministry', label: 'JY / Ministry activity', type: 'check' },
+// ─── Habit definitions ──────────────────────────────────────
+const CATS=[
+  {name:'Spiritual',color:'#4166F5',habits:[
+    {id:'mass',label:'Mass',type:'time',placeholder:'e.g. 07:30'},
+    {id:'rosary',label:'Rosary',type:'check'},
+    {id:'adoration',label:'Adoration',type:'duration',placeholder:'minutes'},
+    {id:'dmc',label:'DMC',type:'check'},
+    {id:'bible',label:'Bible reading',type:'text',placeholder:'e.g. John 3:16-21',wide:true},
+    {id:'prayer',label:'Personal prayer',type:'check'},
+    {id:'jy_ministry',label:'JY / Ministry activity',type:'check'},
   ]},
-  { name: 'Physical', color: '#4ade80', habits: [
-    { id: 'workout', label: 'Workout 30min', type: 'check' },
-    { id: 'breakfast', label: 'Breakfast', type: 'check' },
-    { id: 'lunch', label: 'Lunch', type: 'check' },
-    { id: 'dinner', label: 'Dinner', type: 'check' },
+  {name:'Physical',color:'#4ade80',habits:[
+    {id:'workout',label:'Workout 30min',type:'check'},
+    {id:'breakfast',label:'Breakfast',type:'check'},
+    {id:'lunch',label:'Lunch',type:'check'},
+    {id:'dinner',label:'Dinner',type:'check'},
   ]},
-  { name: 'Social', color: '#38bdf8', habits: [
-    { id: 'replied', label: 'Replied to everyone', type: 'check' },
-    { id: 'called', label: 'Called / talked with', type: 'text' },
+  {name:'Social',color:'#38bdf8',habits:[
+    {id:'replied',label:'Replied to everyone',type:'check'},
+    {id:'called',label:'Called / talked with',type:'text',placeholder:'Name(s)'},
   ]},
-  { name: 'Mental', color: '#facc15', habits: [
-    { id: 'wake_time', label: 'Wake up time', type: 'time' },
-    { id: 'sleep_time', label: 'Sleep time', type: 'time' },
-    { id: 'rest_notes', label: 'Rest notes', type: 'text' },
+  {name:'Mental',color:'#facc15',habits:[
+    {id:'wake_time',label:'Wake up time',type:'time'},
+    {id:'sleep_time',label:'Sleep time',type:'time'},
+    {id:'rest_notes',label:'Rest notes',type:'text',placeholder:'How did you rest?'},
   ]},
-  { name: 'Intellectual', color: '#fb923c', habits: [
-    { id: 'reading', label: 'Book reading 30min', type: 'check' },
-    { id: 'project', label: 'Work on project', type: 'check' },
+  {name:'Intellectual',color:'#fb923c',habits:[
+    {id:'reading',label:'Book reading 30min',type:'check'},
+    {id:'project',label:'Work on project',type:'check'},
   ]},
 ];
 
-const DOMAINS = [
-  { name: 'Faith', emoji: '&#10013;' },
-  { name: 'Ministry', emoji: '&#128330;' },
-  { name: 'Finance', emoji: '&#128176;' },
-  { name: 'Career', emoji: '&#128188;' },
-  { name: 'GridNodes', emoji: '&#9889;' },
-  { name: 'Health', emoji: '&#127947;' },
-  { name: 'Relationships', emoji: '&#129309;' },
-  { name: 'Family', emoji: '&#128106;' },
+const DOMAINS=[
+  {name:'Faith',emoji:'&#10013;'},{name:'Ministry',emoji:'&#128330;'},{name:'Finance',emoji:'&#128176;'},
+  {name:'Career',emoji:'&#128188;'},{name:'GridNodes',emoji:'&#9889;'},{name:'Health',emoji:'&#127947;'},
+  {name:'Relationships',emoji:'&#129309;'},{name:'Family',emoji:'&#128106;'},
 ];
-const DOMAIN_COLORS = ['#8b82f0','#a78bfa','#4ade80','#facc15','#fb923c','#38bdf8','#f472b6','#f87171'];
-const DOMAIN_DESCS = [
-  'Daily Mass, Rosary, Adoration, personal prayer life.',
-  'Jesus Youth, Nightfever, Emmaus, Global2033.',
-  'Budgeting, savings, investments.',
-  'Manufacturing to Validation/CQV Engineering.',
-  'AI automation business using n8n.',
-  'Workout, nutrition, sleep, energy.',
-  'Friends, community, staying connected.',
-  'Parents, siblings, extended family.',
-];
+const DOMAIN_COLORS=['#4166F5','#7c8cf5','#4ade80','#facc15','#fb923c','#38bdf8','#f472b6','#f87171'];
+const DOMAIN_DESCS=['Daily Mass, Rosary, Adoration, personal prayer.','Jesus Youth, Nightfever, Emmaus, Global2033.','Budgeting, savings, investments.','Manufacturing to Validation/CQV.','AI automation with n8n.','Workout, nutrition, sleep, energy.','Friends, community, connection.','Parents, siblings, extended family.'];
 
-let currentDate = new Date();
-let currentWeekOffset = 0;
-let disciplineCache = lsGet('discipline_log');
-let scoreCache = lsGet('score_log');
+let currentDate=new Date(),currentWeekOffset=0;
+let disciplineCache=lsGet('discipline_log'),scoreCache=lsGet('score_log');
 
-// ─── Helpers ────────────────────────────────────────────────
-function dateStr(d) {
-  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+function dateStr(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+function formatDate(d){return d.toLocaleDateString('en-IE',{weekday:'long',year:'numeric',month:'long',day:'numeric'})}
+function changeDate(delta){currentDate.setDate(currentDate.getDate()+delta);renderDisciplines()}
+function goToday(){currentDate=new Date();renderDisciplines()}
+function changeWeek(delta){currentWeekOffset+=delta;renderScoreSliders()}
+function goCurrentWeek(){currentWeekOffset=0;renderScoreSliders()}
+function getWeekLabel(offset){const d=new Date();d.setDate(d.getDate()+offset*7);const j=new Date(d.getFullYear(),0,1);return `W${Math.ceil(((d-j)/864e5+j.getDay()+1)/7)} ${d.getFullYear()}`}
+
+// ─── Completion: ALL fields count ───────────────────────────
+function allHabits(){return CATS.flatMap(c=>c.habits)}
+function totalFields(){return allHabits().length}
+function countFilled(entry){
+  if(!entry)return 0;
+  return allHabits().filter(h=>{
+    const v=entry[h.id];
+    if(h.type==='check')return v===true;
+    if(h.type==='duration')return v&&parseInt(v)>0;
+    return v&&String(v).trim().length>0;
+  }).length;
 }
-function formatDate(d) {
-  return d.toLocaleDateString('en-IE', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-}
-function getCheckIds() { return CATS.flatMap(c => c.habits.filter(h => h.type === 'check').map(h => h.id)); }
-function totalCheckable() { return getCheckIds().length; }
-function countChecked(entry) { return getCheckIds().filter(id => entry && entry[id]).length; }
-function completionPct(entry) { const t = totalCheckable(); return t ? Math.round((countChecked(entry) / t) * 100) : 0; }
-
-function changeDate(delta) { currentDate.setDate(currentDate.getDate() + delta); renderDisciplines(); }
-function goToday() { currentDate = new Date(); renderDisciplines(); }
-function changeWeek(delta) { currentWeekOffset += delta; renderScoreSliders(); }
-function goCurrentWeek() { currentWeekOffset = 0; renderScoreSliders(); }
-
-function getWeekLabel(offset) {
-  const d = new Date();
-  d.setDate(d.getDate() + offset * 7);
-  const jan1 = new Date(d.getFullYear(), 0, 1);
-  const wk = Math.ceil(((d - jan1) / 86400000 + jan1.getDay() + 1) / 7);
-  return `W${wk} ${d.getFullYear()}`;
-}
+function completionPct(entry){const t=totalFields();return t?Math.round((countFilled(entry)/t)*100):0}
 
 // ─── Streaks ────────────────────────────────────────────────
-function calcStreaks() {
-  const threshold = Math.floor(totalCheckable() * 0.7);
-  let current = 0;
-  let best = 0;
-  let d = new Date();
-
-  const todayEntry = disciplineCache[dateStr(d)];
-  const todayMet = todayEntry && countChecked(todayEntry) >= threshold;
-  if (todayMet) current = 1;
-
-  d.setDate(d.getDate() - 1);
-  while (true) {
-    const entry = disciplineCache[dateStr(d)];
-    if (!entry || countChecked(entry) < threshold) break;
-    current++;
-    d.setDate(d.getDate() - 1);
+function calcStreaks(){
+  const threshold=Math.floor(totalFields()*0.7);
+  let current=0,best=0,d=new Date();
+  if(disciplineCache[dateStr(d)]&&countFilled(disciplineCache[dateStr(d)])>=threshold)current=1;
+  d.setDate(d.getDate()-1);
+  while(true){const e=disciplineCache[dateStr(d)];if(!e||countFilled(e)<threshold)break;current++;d.setDate(d.getDate()-1)}
+  const dates=Object.keys(disciplineCache).sort();let ts=0;
+  for(let i=0;i<dates.length;i++){
+    if(i>0){const diff=(new Date(dates[i])-new Date(dates[i-1]))/864e5;if(diff>1)ts=0}
+    if(countFilled(disciplineCache[dates[i]])>=threshold){ts++;best=Math.max(best,ts)}else ts=0;
   }
-
-  const allDates = Object.keys(disciplineCache).sort();
-  let tempStreak = 0;
-  for (let i = 0; i < allDates.length; i++) {
-    const e = disciplineCache[allDates[i]];
-    if (countChecked(e) >= threshold) {
-      tempStreak++;
-      best = Math.max(best, tempStreak);
-    } else {
-      tempStreak = 0;
-    }
-    if (i > 0) {
-      const prev = new Date(allDates[i-1]);
-      const curr = new Date(allDates[i]);
-      const diff = (curr - prev) / 86400000;
-      if (diff > 1) tempStreak = countChecked(e) >= threshold ? 1 : 0;
-    }
-  }
-
-  return { current, best: Math.max(best, current) };
+  return{current,best:Math.max(best,current)}
 }
+function renderStreakMilestones(c){const m=[7,14,30,60,90];const el=document.getElementById('streakMilestones');if(el)el.innerHTML=m.map(v=>`<div class="milestone ${c>=v?'reached':''}">${v}</div>`).join('')}
 
-function renderStreakMilestones(current) {
-  const milestones = [7, 14, 30, 60, 90];
-  const container = document.getElementById('streakMilestones');
-  if (!container) return;
-  container.innerHTML = milestones.map(m =>
-    `<div class="milestone ${current >= m ? 'reached' : ''}">${m}</div>`
-  ).join('');
+// ─── Mass mode & Adoration avg ──────────────────────────────
+function calcMassMode(){
+  const times={};
+  Object.values(disciplineCache).forEach(e=>{if(e.mass&&String(e.mass).includes(':')){const t=e.mass;times[t]=(times[t]||0)+1}});
+  let maxK='-',maxV=0;
+  Object.entries(times).forEach(([k,v])=>{if(v>maxV){maxV=v;maxK=k}});
+  return maxK;
+}
+function calcAdorationAvg(){
+  let sum=0,count=0;
+  Object.values(disciplineCache).forEach(e=>{if(e.adoration&&parseInt(e.adoration)>0){sum+=parseInt(e.adoration);count++}});
+  return count?Math.round(sum/count):0;
 }
 
 // ─── Dashboard ──────────────────────────────────────────────
-function renderDashboard() {
-  const hour = new Date().getHours();
-  const greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
-  document.getElementById('dashGreeting').textContent = `${greeting}, Prince. Here's your overview.`;
-
-  const todayKey = dateStr(new Date());
-  const todayEntry = disciplineCache[todayKey] || {};
-  const pct = completionPct(todayEntry);
-
-  const circ = 2 * Math.PI * 38;
-  const offset = circ - (pct / 100) * circ;
-  document.getElementById('dashRingFill').style.strokeDashoffset = offset;
-  document.getElementById('dashRingPct').textContent = pct + '%';
-
-  const { current, best } = calcStreaks();
-  document.getElementById('dashStreak').textContent = current;
-  document.getElementById('dashBestStreak').textContent = best;
-  document.getElementById('dashTotalDays').textContent = Object.keys(disciplineCache).length;
-
-  const weekDays = [];
-  const d = new Date();
-  const dayOfWeek = d.getDay() || 7;
-  for (let i = dayOfWeek - 1; i >= 0; i--) {
-    const wd = new Date(d);
-    wd.setDate(d.getDate() - i);
-    weekDays.push(dateStr(wd));
-  }
-  const weekPcts = weekDays.map(k => completionPct(disciplineCache[k]));
-  const weekAvg = weekPcts.length ? Math.round(weekPcts.reduce((a, b) => a + b, 0) / weekPcts.length) : 0;
-  document.getElementById('dashWeekAvg').textContent = weekAvg + '%';
-
-  renderHeatmap();
-  renderLast7Days();
-  renderDashboardCards();
+function renderDashboard(){
+  const h=new Date().getHours();
+  document.getElementById('dashGreeting').textContent=(h<12?'Good morning':h<18?'Good afternoon':'Good evening')+', Prince.';
+  const todayEntry=disciplineCache[dateStr(new Date())]||{};
+  const pct=completionPct(todayEntry);
+  const circ=2*Math.PI*36;
+  document.getElementById('dashRingFill').style.strokeDashoffset=circ-(pct/100)*circ;
+  document.getElementById('dashRingPct').textContent=pct+'%';
+  const{current,best}=calcStreaks();
+  document.getElementById('dashStreak').textContent=current;
+  document.getElementById('dashBestStreak').textContent=best;
+  document.getElementById('dashTotalDays').textContent=Object.keys(disciplineCache).length;
+  const d=new Date(),dow=d.getDay()||7,wk=[];
+  for(let i=dow-1;i>=0;i--){const w=new Date(d);w.setDate(d.getDate()-i);wk.push(dateStr(w))}
+  const wp=wk.map(k=>completionPct(disciplineCache[k]));
+  document.getElementById('dashWeekAvg').textContent=(wp.length?Math.round(wp.reduce((a,b)=>a+b,0)/wp.length):0)+'%';
+  document.getElementById('dashMassMode').textContent=calcMassMode();
+  const adorAvg=calcAdorationAvg();
+  document.getElementById('dashAdorationAvg').textContent=adorAvg?adorAvg+'m':'-';
+  renderHeatmap();renderLast7Days();renderDashboardCards();
 }
 
-function renderHeatmap() {
-  const heatmap = document.getElementById('heatmap');
-  const monthsEl = document.getElementById('heatmapMonths');
-  heatmap.innerHTML = '';
-  monthsEl.innerHTML = '';
-
-  const today = new Date();
-  const totalDays = 16 * 7;
-  const startDate = new Date(today);
-  startDate.setDate(today.getDate() - totalDays + 1);
-  const startDay = startDate.getDay();
-  if (startDay > 0) startDate.setDate(startDate.getDate() - startDay);
-
-  const tooltip = document.getElementById('heatmapTooltip');
-  let currentWeekEl = null;
-  let lastMonth = -1;
-  let weekCount = 0;
-  const d = new Date(startDate);
-
-  while (d <= today || d.getDay() !== 0) {
-    if (d.getDay() === 0) {
-      currentWeekEl = document.createElement('div');
-      currentWeekEl.className = 'heatmap-week';
-      heatmap.appendChild(currentWeekEl);
-      weekCount++;
-
-      if (d.getMonth() !== lastMonth) {
-        lastMonth = d.getMonth();
-      }
-    }
-    if (!currentWeekEl) {
-      currentWeekEl = document.createElement('div');
-      currentWeekEl.className = 'heatmap-week';
-      heatmap.appendChild(currentWeekEl);
-    }
-
-    const key = dateStr(d);
-    const entry = disciplineCache[key];
-    const pct = entry ? completionPct(entry) : 0;
-    const isFuture = d > today;
-
-    let level = 0;
-    if (!isFuture && entry) {
-      if (pct >= 90) level = 4;
-      else if (pct >= 70) level = 3;
-      else if (pct >= 40) level = 2;
-      else if (pct > 0) level = 1;
-    }
-
-    const dayEl = document.createElement('div');
-    dayEl.className = 'heatmap-day' + (isFuture ? ' future' : '');
-    dayEl.setAttribute('data-level', level);
-    dayEl.setAttribute('data-date', key);
-    dayEl.setAttribute('data-pct', pct);
-
-    dayEl.addEventListener('mouseenter', e => {
-      const dateLabel = new Date(key).toLocaleDateString('en-IE', { weekday: 'short', month: 'short', day: 'numeric' });
-      tooltip.textContent = `${dateLabel} — ${pct}%`;
-      tooltip.style.display = 'block';
-      tooltip.style.left = e.clientX + 12 + 'px';
-      tooltip.style.top = e.clientY - 30 + 'px';
-    });
-    dayEl.addEventListener('mouseleave', () => { tooltip.style.display = 'none'; });
-
-    currentWeekEl.appendChild(dayEl);
-
-    if (d > today) break;
-    d.setDate(d.getDate() + 1);
-    if (d > today && d.getDay() !== 0) {
-      while (d.getDay() !== 0) {
-        const filler = document.createElement('div');
-        filler.className = 'heatmap-day future';
-        filler.setAttribute('data-level', '0');
-        currentWeekEl.appendChild(filler);
-        d.setDate(d.getDate() + 1);
-      }
-      break;
-    }
+function renderHeatmap(){
+  const hm=document.getElementById('heatmap');hm.innerHTML='';
+  const today=new Date(),start=new Date(today);start.setDate(today.getDate()-16*7+1);
+  const sd=start.getDay();if(sd>0)start.setDate(start.getDate()-sd);
+  const tooltip=document.getElementById('heatmapTooltip');
+  let wkEl=null;const d=new Date(start);
+  while(d<=today||d.getDay()!==0){
+    if(d.getDay()===0){wkEl=document.createElement('div');wkEl.className='heatmap-week';hm.appendChild(wkEl)}
+    if(!wkEl){wkEl=document.createElement('div');wkEl.className='heatmap-week';hm.appendChild(wkEl)}
+    const key=dateStr(d),entry=disciplineCache[key],pct=entry?completionPct(entry):0,isFuture=d>today;
+    let level=0;if(!isFuture&&entry){if(pct>=90)level=4;else if(pct>=70)level=3;else if(pct>=40)level=2;else if(pct>0)level=1}
+    const el=document.createElement('div');el.className='heatmap-day'+(isFuture?' future':'');el.setAttribute('data-level',level);
+    ((k,p)=>{el.addEventListener('mouseenter',e=>{const dl=new Date(k).toLocaleDateString('en-IE',{weekday:'short',month:'short',day:'numeric'});tooltip.textContent=`${dl} — ${p}%`;tooltip.style.display='block';tooltip.style.left=e.clientX+12+'px';tooltip.style.top=e.clientY-30+'px'});el.addEventListener('mouseleave',()=>{tooltip.style.display='none'})})(key,pct);
+    wkEl.appendChild(el);
+    if(d>today)break;d.setDate(d.getDate()+1);
+    if(d>today&&d.getDay()!==0){while(d.getDay()!==0){const f=document.createElement('div');f.className='heatmap-day future';f.setAttribute('data-level','0');wkEl.appendChild(f);d.setDate(d.getDate()+1)}break}
   }
 }
 
-function renderLast7Days() {
-  const container = document.getElementById('completionBars');
-  container.innerHTML = '';
-  const today = new Date();
-  const dayNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-
-  for (let i = 6; i >= 0; i--) {
-    const d = new Date(today);
-    d.setDate(today.getDate() - i);
-    const key = dateStr(d);
-    const pct = completionPct(disciplineCache[key]);
-    const isToday = i === 0;
-
-    const col = document.createElement('div');
-    col.className = 'completion-bar-col';
-    col.innerHTML = `
-      <div class="completion-bar-pct">${pct}%</div>
-      <div class="completion-bar ${isToday ? 'today' : ''}" style="height:${Math.max(pct, 3)}%"></div>
-      <div class="completion-bar-label">${isToday ? 'Today' : dayNames[d.getDay()]}</div>
-    `;
-    container.appendChild(col);
+function renderLast7Days(){
+  const c=document.getElementById('completionBars');c.innerHTML='';
+  const today=new Date(),dn=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  for(let i=6;i>=0;i--){
+    const d=new Date(today);d.setDate(today.getDate()-i);const key=dateStr(d),pct=completionPct(disciplineCache[key]),isToday=i===0;
+    const col=document.createElement('div');col.className='completion-bar-col';
+    col.innerHTML=`<div class="completion-bar-pct">${pct}%</div><div class="completion-bar ${isToday?'today':''}" style="height:${Math.max(pct,3)}%"></div><div class="completion-bar-label">${isToday?'Today':dn[d.getDay()]}</div>`;
+    c.appendChild(col);
   }
 }
 
-function renderDashboardCards() {
-  const container = document.getElementById('dashboardCards');
-  container.innerHTML = '';
-  const latestWeeks = Object.keys(scoreCache).sort().slice(-8);
-
-  DOMAINS.forEach((domain, i) => {
-    const latestScores = latestWeeks.map(w => (scoreCache[w] || {})[domain.name] || 0);
-    const latest = latestScores.length ? latestScores[latestScores.length - 1] : 0;
-    const maxBar = 10;
-
-    const card = document.createElement('div');
-    card.className = 'domain-card';
-    card.innerHTML = `
-      <div class="card-header">
-        <div class="card-icon">${domain.emoji}</div>
-        <div>
-          <div class="card-title">${domain.name}</div>
-          <div class="card-desc" style="margin:0">${DOMAIN_DESCS[i]}</div>
-        </div>
-        <div class="card-score" style="margin-left:auto">${latest || '-'}</div>
-      </div>
-      <div class="card-bar"><div class="card-bar-fill" style="width:${(latest/maxBar)*100}%;background:${DOMAIN_COLORS[i]}"></div></div>
-      <div class="card-mini-trend" id="trend-${domain.name}"></div>
-    `;
-    container.appendChild(card);
-
-    const trendEl = card.querySelector('.card-mini-trend');
-    if (latestScores.length > 1) {
-      const max = Math.max(...latestScores, 1);
-      latestScores.forEach(s => {
-        const bar = document.createElement('span');
-        bar.style.height = Math.max((s / max) * 24, 2) + 'px';
-        bar.style.background = DOMAIN_COLORS[i];
-        trendEl.appendChild(bar);
-      });
-    }
+function renderDashboardCards(){
+  const c=document.getElementById('dashboardCards');c.innerHTML='';
+  const wks=Object.keys(scoreCache).sort().slice(-8);
+  DOMAINS.forEach((dom,i)=>{
+    const scores=wks.map(w=>(scoreCache[w]||{})[dom.name]||0),latest=scores.length?scores[scores.length-1]:0;
+    const card=document.createElement('div');card.className='domain-card';
+    card.innerHTML=`<div class="card-header"><div class="card-icon">${dom.emoji}</div><div><div class="card-title">${dom.name}</div><div class="card-desc" style="margin:0">${DOMAIN_DESCS[i]}</div></div><div class="card-score" style="margin-left:auto">${latest||'-'}</div></div><div class="card-bar"><div class="card-bar-fill" style="width:${(latest/10)*100}%;background:${DOMAIN_COLORS[i]}"></div></div><div class="card-mini-trend"></div>`;
+    c.appendChild(card);
+    const tr=card.querySelector('.card-mini-trend');
+    if(scores.length>1){const mx=Math.max(...scores,1);scores.forEach(s=>{const b=document.createElement('span');b.style.height=Math.max((s/mx)*20,2)+'px';b.style.background=DOMAIN_COLORS[i];tr.appendChild(b)})}
   });
 }
 
 // ─── Disciplines ────────────────────────────────────────────
-function renderDisciplines() {
-  const key = dateStr(currentDate);
-  document.getElementById('dateLabel').textContent = formatDate(currentDate);
-  const entry = disciplineCache[key] || {};
+function showDisciplineTab(tab,btn){
+  document.querySelectorAll('#page-disciplines .tab-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  ['Today','Month','Year','Alltime'].forEach(t=>{document.getElementById('disc'+t).style.display='none'});
+  document.getElementById('disc'+tab.charAt(0).toUpperCase()+tab.slice(1)).style.display='';
+  if(tab==='month')renderMonthOverview();
+  if(tab==='year')renderYearOverview();
+  if(tab==='alltime')renderAlltimeOverview();
+}
 
-  const { current, best } = calcStreaks();
-  document.getElementById('streakCount').textContent = current;
-  document.getElementById('bestStreakCount').textContent = best;
-  document.getElementById('streakFlame').style.opacity = current > 0 ? '1' : '.3';
+function renderDisciplines(){
+  const key=dateStr(currentDate);
+  document.getElementById('dateLabel').textContent=formatDate(currentDate);
+  const entry=disciplineCache[key]||{};
+  const{current,best}=calcStreaks();
+  document.getElementById('streakCount').textContent=current;
+  document.getElementById('bestStreakCount').textContent=best;
+  document.getElementById('streakFlame').style.opacity=current>0?'1':'.3';
   renderStreakMilestones(current);
-
   renderCatProgress(entry);
+  const container=document.getElementById('habitsContainer');container.innerHTML='';
 
-  const container = document.getElementById('habitsContainer');
-  container.innerHTML = '';
+  CATS.forEach(cat=>{
+    const catHabits=cat.habits;
+    const catFilled=catHabits.filter(h=>{
+      const v=entry[h.id];
+      if(h.type==='check')return v===true;
+      if(h.type==='duration')return v&&parseInt(v)>0;
+      return v&&String(v).trim().length>0;
+    }).length;
+    const section=document.createElement('div');section.className='category-section';
+    section.innerHTML=`<div class="category-header"><div class="category-title" style="color:${cat.color}">${cat.name}</div><div class="category-count">${catFilled}/${catHabits.length}</div></div>`;
 
-  CATS.forEach(cat => {
-    const catChecks = cat.habits.filter(h => h.type === 'check');
-    const catDone = catChecks.filter(h => entry[h.id]).length;
-    const section = document.createElement('div');
-    section.className = 'category-section';
-    section.innerHTML = `
-      <div class="category-header">
-        <div class="category-title" style="color:${cat.color}">${cat.name}</div>
-        <div class="category-count">${catChecks.length ? catDone + '/' + catChecks.length : ''}</div>
-      </div>`;
-
-    cat.habits.forEach(h => {
-      const row = document.createElement('div');
-      row.className = 'habit-row';
-      const val = entry[h.id] || '';
-
-      if (h.type === 'check') {
-        row.innerHTML = `
-          <input type="checkbox" class="habit-check" data-id="${h.id}" ${val ? 'checked' : ''}>
-          <span class="habit-label">${h.label}</span>`;
-      } else if (h.type === 'text') {
-        row.innerHTML = `
-          <span class="habit-label">${h.label}</span>
-          <input type="text" class="habit-input" data-id="${h.id}" value="${typeof val === 'string' ? val.replace(/"/g, '&quot;') : ''}" placeholder="...">`;
-      } else if (h.type === 'time') {
-        row.innerHTML = `
-          <span class="habit-label">${h.label}</span>
-          <input type="time" class="habit-input" data-id="${h.id}" value="${val}">`;
+    catHabits.forEach(h=>{
+      const row=document.createElement('div');row.className='habit-row';
+      const val=entry[h.id]||'';
+      if(h.type==='check'){
+        row.innerHTML=`<input type="checkbox" class="habit-check" data-id="${h.id}" ${val?'checked':''}><span class="habit-label">${h.label}</span>`;
+      }else if(h.type==='time'){
+        row.innerHTML=`<span class="habit-label">${h.label}</span><input type="time" class="habit-input ${val?'filled':''}" data-id="${h.id}" value="${val}">`;
+      }else if(h.type==='duration'){
+        row.innerHTML=`<span class="habit-label">${h.label}</span><input type="number" class="habit-input ${val?'filled':''}" data-id="${h.id}" value="${val}" placeholder="${h.placeholder||''}" min="0" style="width:100px"><span class="habit-badge">min</span>`;
+      }else{
+        row.innerHTML=`<span class="habit-label">${h.label}</span><input type="text" class="habit-input ${h.wide?'habit-input-wide':''} ${val?'filled':''}" data-id="${h.id}" value="${typeof val==='string'?val.replace(/"/g,'&quot;'):''}" placeholder="${h.placeholder||'...'}">`;
       }
       section.appendChild(row);
     });
     container.appendChild(section);
   });
-
   updateDisciplineStats();
 }
 
-function renderCatProgress(entry) {
-  const grid = document.getElementById('catProgressGrid');
-  grid.innerHTML = '';
-  CATS.forEach(cat => {
-    const checks = cat.habits.filter(h => h.type === 'check');
-    if (!checks.length) return;
-    const done = checks.filter(h => entry[h.id]).length;
-    const pct = Math.round((done / checks.length) * 100);
-    const el = document.createElement('div');
-    el.className = 'cat-progress';
-    el.innerHTML = `
-      <div class="cat-progress-name" style="color:${cat.color}">${cat.name}</div>
-      <div class="cat-progress-bar"><div class="cat-progress-fill" style="width:${pct}%;background:${cat.color}"></div></div>
-      <div class="cat-progress-pct" style="color:${cat.color}">${pct}%</div>`;
+function renderCatProgress(entry){
+  const grid=document.getElementById('catProgressGrid');grid.innerHTML='';
+  CATS.forEach(cat=>{
+    const total=cat.habits.length;
+    const done=cat.habits.filter(h=>{
+      const v=entry[h.id];
+      if(h.type==='check')return v===true;
+      if(h.type==='duration')return v&&parseInt(v)>0;
+      return v&&String(v).trim().length>0;
+    }).length;
+    const pct=Math.round((done/total)*100);
+    const el=document.createElement('div');el.className='cat-progress';
+    el.innerHTML=`<div class="cat-progress-name" style="color:${cat.color}">${cat.name}</div><div class="cat-progress-bar"><div class="cat-progress-fill" style="width:${pct}%;background:${cat.color}"></div></div><div class="cat-progress-pct" style="color:${cat.color}">${pct}%</div>`;
     grid.appendChild(el);
   });
 }
 
-function gatherEntry() {
-  const entry = {};
-  document.querySelectorAll('.habit-check').forEach(el => { entry[el.dataset.id] = el.checked; });
-  document.querySelectorAll('.habit-input').forEach(el => { if (el.value) entry[el.dataset.id] = el.value; });
+function gatherEntry(){
+  const entry={};
+  document.querySelectorAll('.habit-check').forEach(el=>{entry[el.dataset.id]=el.checked});
+  document.querySelectorAll('.habit-input').forEach(el=>{if(el.value.trim())entry[el.dataset.id]=el.type==='number'?parseInt(el.value):el.value});
   return entry;
 }
 
-function updateDisciplineStats() {
-  const entry = gatherEntry();
-  const pct = completionPct(entry);
-  renderCatProgress(entry);
+function updateDisciplineStats(){const entry=gatherEntry();renderCatProgress(entry)}
 
-  CATS.forEach(cat => {
-    const checks = cat.habits.filter(h => h.type === 'check');
-    if (!checks.length) return;
-    const done = checks.filter(h => entry[h.id]).length;
-    const headers = document.querySelectorAll('.category-count');
-  });
-}
-
-async function saveDisciplines() {
-  const key = dateStr(currentDate);
-  const entry = gatherEntry();
-  disciplineCache[key] = entry;
-  lsSet('discipline_log', disciplineCache);
+async function saveDisciplines(){
+  const key=dateStr(currentDate),entry=gatherEntry();
+  disciplineCache[key]=entry;lsSet('discipline_log',disciplineCache);
   updateDisciplineStats();
-
-  const { current } = calcStreaks();
-  document.getElementById('streakCount').textContent = current;
-  renderStreakMilestones(current);
-
-  document.getElementById('lastSaved').textContent = 'Saved at ' + new Date().toLocaleTimeString('en-IE', { hour: '2-digit', minute: '2-digit' });
-
+  const{current}=calcStreaks();document.getElementById('streakCount').textContent=current;renderStreakMilestones(current);
+  document.getElementById('lastSaved').textContent='Saved at '+new Date().toLocaleTimeString('en-IE',{hour:'2-digit',minute:'2-digit'});
   updateSyncStatus('saving');
-  const result = await sbFetch('discipline_log', 'POST', { date: key, entry, updated_at: new Date().toISOString() });
-  toast(result ? 'Entry saved & synced' : 'Saved locally (offline)', result ? 'success' : 'error');
+  const result=await sbFetch('discipline_log','POST',{date:key,entry,updated_at:new Date().toISOString()});
+  toast(result?'Saved & synced':'Saved locally',result?'success':'error');
 }
 
-document.getElementById('habitsContainer').addEventListener('change', updateDisciplineStats);
+document.getElementById('habitsContainer').addEventListener('change',updateDisciplineStats);
+document.getElementById('habitsContainer').addEventListener('input',e=>{
+  if(e.target.classList.contains('habit-input')){
+    e.target.classList.toggle('filled',e.target.value.trim().length>0);
+    updateDisciplineStats();
+  }
+});
 
-// ─── Weekly Scores ──────────────────────────────────────────
-function renderScoreSliders() {
-  const wk = getWeekLabel(currentWeekOffset);
-  document.getElementById('weekLabel').textContent = wk;
-  const scores = scoreCache[wk] || {};
-  const grid = document.getElementById('scoreGrid');
-  grid.innerHTML = '';
+// ─── Month / Year / All-time overviews ──────────────────────
+function renderMonthOverview(){
+  const container=document.getElementById('discMonth');
+  const now=new Date(),year=now.getFullYear(),month=now.getMonth();
+  const firstDay=new Date(year,month,1).getDay();
+  const daysInMonth=new Date(year,month+1,0).getDate();
+  const monthName=now.toLocaleDateString('en-IE',{month:'long',year:'numeric'});
 
-  DOMAINS.forEach((domain, i) => {
-    const val = scores[domain.name] || 5;
-    const item = document.createElement('div');
-    item.className = 'score-item';
-    item.innerHTML = `
-      <div class="score-header">
-        <span class="score-domain"><span class="score-emoji">${domain.emoji}</span> ${domain.name}</span>
-        <span class="score-value" id="sv-${domain.name}">${val}</span>
+  let totalPct=0,daysLogged=0;
+  const dayPcts=[];
+  for(let d=1;d<=daysInMonth;d++){
+    const key=dateStr(new Date(year,month,d));
+    const pct=completionPct(disciplineCache[key]);
+    dayPcts.push(pct);
+    if(disciplineCache[key]){daysLogged++;totalPct+=pct}
+  }
+  const monthAvg=daysLogged?Math.round(totalPct/daysLogged):0;
+
+  const habitStats={};
+  allHabits().forEach(h=>{habitStats[h.id]={filled:0,total:daysLogged,label:h.label}});
+  for(let d=1;d<=daysInMonth;d++){
+    const key=dateStr(new Date(year,month,d));
+    const entry=disciplineCache[key];
+    if(!entry)continue;
+    allHabits().forEach(h=>{
+      const v=entry[h.id];
+      const isFilled=h.type==='check'?v===true:h.type==='duration'?(v&&parseInt(v)>0):(v&&String(v).trim().length>0);
+      if(isFilled)habitStats[h.id].filled++;
+    });
+  }
+  const sorted=Object.values(habitStats).sort((a,b)=>(b.filled/Math.max(b.total,1))-(a.filled/Math.max(a.total,1)));
+
+  let calHtml='<div class="month-cal"><div class="month-cal-head">S</div><div class="month-cal-head">M</div><div class="month-cal-head">T</div><div class="month-cal-head">W</div><div class="month-cal-head">T</div><div class="month-cal-head">F</div><div class="month-cal-head">S</div>';
+  for(let i=0;i<firstDay;i++)calHtml+='<div class="month-cal-day empty"></div>';
+  for(let d=1;d<=daysInMonth;d++){
+    const pct=dayPcts[d-1];const isToday=d===now.getDate()&&month===now.getMonth();
+    const color=pct>=70?'var(--accent)':pct>=40?'rgba(var(--accent-rgb),.4)':pct>0?'rgba(var(--accent-rgb),.15)':'transparent';
+    calHtml+=`<div class="month-cal-day ${disciplineCache[dateStr(new Date(year,month,d))]?'logged':''} ${isToday?'today-cell':''}"><div class="day-fill" style="background:${color}"></div><span class="day-num">${d}</span></div>`;
+  }
+  calHtml+='</div>';
+
+  let habitList=sorted.slice(0,10).map(h=>{
+    const pct=h.total?Math.round((h.filled/h.total)*100):0;
+    const barColor=pct>=70?'var(--accent)':pct>=40?'var(--yellow)':'var(--red)';
+    return `<div style="display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid var(--border)"><span style="flex:1;font-size:.82rem">${h.label}</span><div style="width:80px;height:4px;background:var(--surface2);border-radius:2px;overflow:hidden"><div style="height:100%;width:${pct}%;background:${barColor};border-radius:2px"></div></div><span style="font-size:.78rem;color:var(--text2);width:36px;text-align:right">${pct}%</span></div>`;
+  }).join('');
+
+  container.innerHTML=`
+    <div class="overview-section">
+      <div class="overview-title">${monthName}</div>
+      <div class="hero-stats" style="grid-template-columns:repeat(3,1fr);margin-bottom:20px">
+        <div class="hero-stat"><div class="hero-stat-label">Month Average</div><div class="hero-stat-value">${monthAvg}%</div></div>
+        <div class="hero-stat"><div class="hero-stat-label">Days Logged</div><div class="hero-stat-value">${daysLogged}</div><div class="hero-stat-sub">of ${daysInMonth}</div></div>
+        <div class="hero-stat"><div class="hero-stat-label">Perfect Days</div><div class="hero-stat-value">${dayPcts.filter(p=>p===100).length}</div><div class="hero-stat-sub">100% completion</div></div>
       </div>
-      <input type="range" class="score-slider" min="1" max="10" value="${val}"
-             oninput="document.getElementById('sv-${domain.name}').textContent=this.value"
-             style="accent-color:${DOMAIN_COLORS[i]}">`;
+      ${calHtml}
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-top:16px">
+        <div style="font-size:.85rem;font-weight:600;margin-bottom:10px">Habit Consistency This Month</div>
+        ${habitList||'<p style="color:var(--text3);font-size:.82rem">No data yet.</p>'}
+      </div>
+    </div>`;
+}
+
+function renderYearOverview(){
+  const container=document.getElementById('discYear');
+  const year=new Date().getFullYear();
+  const monthNames=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  let html='<div class="overview-section"><div class="overview-title">'+year+' Overview</div>';
+
+  let yearTotal=0,yearDays=0,monthData=[];
+  for(let m=0;m<12;m++){
+    const dim=new Date(year,m+1,0).getDate();
+    let mTotal=0,mDays=0;
+    for(let d=1;d<=dim;d++){
+      const key=dateStr(new Date(year,m,d));
+      if(disciplineCache[key]){mDays++;mTotal+=completionPct(disciplineCache[key])}
+    }
+    const avg=mDays?Math.round(mTotal/mDays):0;
+    monthData.push({name:monthNames[m],avg,days:mDays});
+    yearTotal+=mTotal;yearDays+=mDays;
+  }
+
+  html+=`<div class="hero-stats" style="grid-template-columns:repeat(3,1fr);margin-bottom:20px">
+    <div class="hero-stat"><div class="hero-stat-label">Year Average</div><div class="hero-stat-value">${yearDays?Math.round(yearTotal/yearDays):0}%</div></div>
+    <div class="hero-stat"><div class="hero-stat-label">Total Days Logged</div><div class="hero-stat-value">${yearDays}</div></div>
+    <div class="hero-stat"><div class="hero-stat-label">Active Months</div><div class="hero-stat-value">${monthData.filter(m=>m.days>0).length}</div></div>
+  </div>`;
+
+  html+='<div class="month-bar-grid">';
+  monthData.forEach(m=>{
+    html+=`<div class="month-bar-item"><div class="month-bar-track"><div class="month-bar-fill" style="height:${m.avg}%"></div></div><div class="month-bar-label">${m.name}</div><div class="month-bar-pct">${m.avg}%</div></div>`;
+  });
+  html+='</div></div>';
+  container.innerHTML=html;
+}
+
+function renderAlltimeOverview(){
+  const container=document.getElementById('discAlltime');
+  const allDates=Object.keys(disciplineCache).sort();
+  const total=allDates.length;
+  if(!total){container.innerHTML='<p style="color:var(--text3)">No data yet.</p>';return}
+
+  let sumPct=0;
+  allDates.forEach(k=>{sumPct+=completionPct(disciplineCache[k])});
+  const avgPct=Math.round(sumPct/total);
+  const perfectDays=allDates.filter(k=>completionPct(disciplineCache[k])===100).length;
+  const{best}=calcStreaks();
+  const firstDate=new Date(allDates[0]).toLocaleDateString('en-IE',{month:'short',day:'numeric',year:'numeric'});
+
+  const habitStats={};
+  allHabits().forEach(h=>{habitStats[h.id]={filled:0,total,label:h.label,type:h.type}});
+  allDates.forEach(k=>{
+    const entry=disciplineCache[k];
+    allHabits().forEach(h=>{
+      const v=entry[h.id];
+      const isFilled=h.type==='check'?v===true:h.type==='duration'?(v&&parseInt(v)>0):(v&&String(v).trim().length>0);
+      if(isFilled)habitStats[h.id].filled++;
+    });
+  });
+  const sorted=Object.values(habitStats).sort((a,b)=>(b.filled/Math.max(b.total,1))-(a.filled/Math.max(a.total,1)));
+
+  let habitList=sorted.map(h=>{
+    const pct=h.total?Math.round((h.filled/h.total)*100):0;
+    const barColor=pct>=70?'var(--accent)':pct>=40?'var(--yellow)':'var(--red)';
+    return `<div style="display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid var(--border)"><span style="flex:1;font-size:.82rem">${h.label}</span><div style="width:80px;height:4px;background:var(--surface2);border-radius:2px;overflow:hidden"><div style="height:100%;width:${pct}%;background:${barColor};border-radius:2px"></div></div><span style="font-size:.78rem;color:var(--text2);width:36px;text-align:right">${pct}%</span></div>`;
+  }).join('');
+
+  container.innerHTML=`
+    <div class="overview-section">
+      <div class="overview-title">All Time</div>
+      <div class="hero-stats" style="margin-bottom:20px">
+        <div class="hero-stat"><div class="hero-stat-label">Overall Average</div><div class="hero-stat-value">${avgPct}%</div></div>
+        <div class="hero-stat"><div class="hero-stat-label">Total Days</div><div class="hero-stat-value">${total}</div><div class="hero-stat-sub">since ${firstDate}</div></div>
+        <div class="hero-stat"><div class="hero-stat-label">Perfect Days</div><div class="hero-stat-value">${perfectDays}</div></div>
+        <div class="hero-stat"><div class="hero-stat-label">Best Streak</div><div class="hero-stat-value">${best}</div><div class="hero-stat-sub">days</div></div>
+      </div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px">
+        <div style="font-size:.85rem;font-weight:600;margin-bottom:10px">All-Time Habit Consistency</div>
+        ${habitList}
+      </div>
+    </div>`;
+}
+
+// ─── Scores ─────────────────────────────────────────────────
+function renderScoreSliders(){
+  const wk=getWeekLabel(currentWeekOffset);document.getElementById('weekLabel').textContent=wk;
+  const scores=scoreCache[wk]||{};const grid=document.getElementById('scoreGrid');grid.innerHTML='';
+  DOMAINS.forEach((dom,i)=>{
+    const val=scores[dom.name]||5;const item=document.createElement('div');item.className='score-item';
+    item.innerHTML=`<div class="score-header"><span class="score-domain">${dom.emoji} ${dom.name}</span><span class="score-value" id="sv-${dom.name}">${val}</span></div><input type="range" class="score-slider" min="1" max="10" value="${val}" oninput="document.getElementById('sv-${dom.name}').textContent=this.value">`;
     grid.appendChild(item);
   });
 }
 
-async function saveScores() {
-  const wk = getWeekLabel(currentWeekOffset);
-  const scores = {};
-  document.querySelectorAll('.score-slider').forEach((sl, i) => {
-    scores[DOMAINS[i].name] = parseInt(sl.value);
-  });
-  scoreCache[wk] = scores;
-  lsSet('score_log', scoreCache);
-
+async function saveScores(){
+  const wk=getWeekLabel(currentWeekOffset),scores={};
+  document.querySelectorAll('.score-slider').forEach((sl,i)=>{scores[DOMAINS[i].name]=parseInt(sl.value)});
+  scoreCache[wk]=scores;lsSet('score_log',scoreCache);
   updateSyncStatus('saving');
-  const result = await sbFetch('score_log', 'POST', { week: wk, scores, updated_at: new Date().toISOString() });
-  toast(result ? 'Scores saved & synced' : 'Saved locally (offline)', result ? 'success' : 'error');
-  renderAllCharts();
+  const result=await sbFetch('score_log','POST',{week:wk,scores,updated_at:new Date().toISOString()});
+  toast(result?'Scores saved & synced':'Saved locally',result?'success':'error');renderAllCharts();
 }
-
-function showScoreTab(tab, btn) {
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  document.getElementById('scoreEntry').style.display = tab === 'entry' ? '' : 'none';
-  document.getElementById('scoreTrends').style.display = tab === 'trends' ? '' : 'none';
-  if (tab === 'trends') renderAllCharts();
+function showScoreTab(tab,btn){
+  document.querySelectorAll('#page-scores .tab-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');
+  document.getElementById('scoreEntry').style.display=tab==='entry'?'':'none';
+  document.getElementById('scoreTrends').style.display=tab==='trends'?'':'none';
+  if(tab==='trends')renderAllCharts();
 }
 
 // ─── Charts ─────────────────────────────────────────────────
-let trendsChartInstance = null;
-let completionChartInstance = null;
-let radarChartInstance = null;
+let trendsChart=null,completionChart=null,radarChart=null;
+function renderAllCharts(){if(!chartsReady)return;renderTrendsChart();renderDeltas()}
 
-function renderAllCharts() {
-  if (!chartsReady) return;
-  renderTrendsChart();
-  renderDeltas();
+function renderTrendsChart(){
+  if(!chartsReady)return;const canvas=document.getElementById('trendsChart');if(!canvas||!canvas.offsetParent)return;
+  const weeks=Object.keys(scoreCache).sort();if(!weeks.length)return;
+  const ds=DOMAINS.map((d,i)=>({label:d.name,data:weeks.map(w=>(scoreCache[w]||{})[d.name]||0),borderColor:DOMAIN_COLORS[i],backgroundColor:DOMAIN_COLORS[i]+'15',tension:.35,pointRadius:3,borderWidth:2,fill:false}));
+  if(trendsChart)trendsChart.destroy();
+  trendsChart=new Chart(canvas,{type:'line',data:{labels:weeks,datasets:ds},options:{responsive:true,interaction:{mode:'index',intersect:false},plugins:{legend:{labels:{color:'#9595a8',font:{family:'Inter',size:11},usePointStyle:true,pointStyle:'circle'}},tooltip:{backgroundColor:'#181824',borderColor:'#1f1f30',borderWidth:1,padding:10,cornerRadius:8}},scales:{x:{ticks:{color:'#6a6a80',font:{size:10}},grid:{color:'rgba(31,31,48,.5)'}},y:{min:0,max:10,ticks:{color:'#6a6a80',stepSize:2,font:{size:10}},grid:{color:'rgba(31,31,48,.5)'}}}}});
 }
 
-function renderTrendsChart() {
-  if (!chartsReady) return;
-  const canvas = document.getElementById('trendsChart');
-  if (!canvas || !canvas.offsetParent) return;
-
-  const weeks = Object.keys(scoreCache).sort();
-  if (!weeks.length) return;
-
-  const datasets = DOMAINS.map((domain, i) => ({
-    label: domain.name,
-    data: weeks.map(w => (scoreCache[w] || {})[domain.name] || 0),
-    borderColor: DOMAIN_COLORS[i],
-    backgroundColor: DOMAIN_COLORS[i] + '15',
-    tension: 0.35,
-    pointRadius: 4,
-    pointHoverRadius: 6,
-    borderWidth: 2.5,
-    fill: false,
-  }));
-
-  if (trendsChartInstance) trendsChartInstance.destroy();
-  trendsChartInstance = new Chart(canvas, {
-    type: 'line',
-    data: { labels: weeks, datasets },
-    options: {
-      responsive: true,
-      interaction: { mode: 'index', intersect: false },
-      plugins: {
-        legend: { labels: { color: '#9595a8', font: { family: 'Inter', size: 12 }, usePointStyle: true, pointStyle: 'circle' } },
-        tooltip: { backgroundColor: '#1a1a24', borderColor: '#222230', borderWidth: 1, titleColor: '#e4e4ed', bodyColor: '#9595a8', padding: 12, cornerRadius: 8 }
-      },
-      scales: {
-        x: { ticks: { color: '#6a6a80', font: { size: 11 } }, grid: { color: 'rgba(34,34,48,.5)' } },
-        y: { min: 0, max: 10, ticks: { color: '#6a6a80', stepSize: 2, font: { size: 11 } }, grid: { color: 'rgba(34,34,48,.5)' } }
-      }
-    }
-  });
-}
-
-function renderDeltas() {
-  const weeks = Object.keys(scoreCache).sort();
-  const grid = document.getElementById('deltaGrid');
-  if (!grid) return;
-  grid.innerHTML = '';
-  if (weeks.length < 2) {
-    grid.innerHTML = '<p style="color:var(--text3);font-size:.85rem">Need at least 2 weeks of data.</p>';
-    return;
-  }
-  const curr = scoreCache[weeks[weeks.length - 1]] || {};
-  const prev = scoreCache[weeks[weeks.length - 2]] || {};
-
-  DOMAINS.forEach((d, i) => {
-    const delta = (curr[d.name] || 0) - (prev[d.name] || 0);
-    const cls = delta > 0 ? 'delta-up' : delta < 0 ? 'delta-down' : 'delta-flat';
-    const sign = delta > 0 ? '+' : '';
-    const arrow = delta > 0 ? '&#9650;' : delta < 0 ? '&#9660;' : '&#8212;';
-    const item = document.createElement('div');
-    item.className = 'delta-item';
-    item.innerHTML = `
-      <span class="delta-domain"><span style="color:${DOMAIN_COLORS[i]}">${d.emoji}</span> ${d.name}</span>
-      <span class="delta-value ${cls}"><span class="delta-arrow">${arrow}</span> ${sign}${delta}</span>`;
+function renderDeltas(){
+  const weeks=Object.keys(scoreCache).sort(),grid=document.getElementById('deltaGrid');if(!grid)return;grid.innerHTML='';
+  if(weeks.length<2){grid.innerHTML='<p style="color:var(--text3);font-size:.82rem">Need 2+ weeks of data.</p>';return}
+  const curr=scoreCache[weeks[weeks.length-1]]||{},prev=scoreCache[weeks[weeks.length-2]]||{};
+  DOMAINS.forEach((d,i)=>{
+    const delta=(curr[d.name]||0)-(prev[d.name]||0),cls=delta>0?'delta-up':delta<0?'delta-down':'delta-flat',sign=delta>0?'+':'';
+    const item=document.createElement('div');item.className='delta-item';
+    item.innerHTML=`<span class="delta-domain"><span style="color:${DOMAIN_COLORS[i]}">${d.emoji}</span> ${d.name}</span><span class="delta-value ${cls}">${sign}${delta}</span>`;
     grid.appendChild(item);
   });
 }
 
 // ─── Insights ───────────────────────────────────────────────
-function renderInsights() {
-  if (!chartsReady) return;
-  renderCompletionTrend();
-  renderCategoryRadar();
-  renderHabitInsights();
+function renderInsights(){if(!chartsReady)return;renderCompletionTrend();renderCategoryRadar();renderHabitInsights()}
+
+function renderCompletionTrend(){
+  const canvas=document.getElementById('completionTrendChart');if(!canvas)return;
+  const labels=[],data=[],today=new Date();
+  for(let i=29;i>=0;i--){const d=new Date(today);d.setDate(today.getDate()-i);labels.push(d.toLocaleDateString('en-IE',{day:'numeric',month:'short'}));data.push(completionPct(disciplineCache[dateStr(d)]))}
+  if(completionChart)completionChart.destroy();
+  completionChart=new Chart(canvas,{type:'bar',data:{labels,datasets:[{data,backgroundColor:data.map(v=>v>=70?'rgba(65,102,245,.6)':v>0?'rgba(65,102,245,.25)':'rgba(24,24,36,.8)'),borderRadius:3,borderSkipped:false}]},options:{responsive:true,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.raw+'%'}}},scales:{x:{ticks:{color:'#6a6a80',font:{size:9},maxRotation:45},grid:{display:false}},y:{min:0,max:100,ticks:{color:'#6a6a80',callback:v=>v+'%'},grid:{color:'rgba(31,31,48,.5)'}}}}});
 }
 
-function renderCompletionTrend() {
-  const canvas = document.getElementById('completionTrendChart');
-  if (!canvas) return;
-
-  const labels = [];
-  const data = [];
-  const today = new Date();
-
-  for (let i = 29; i >= 0; i--) {
-    const d = new Date(today);
-    d.setDate(today.getDate() - i);
-    const key = dateStr(d);
-    labels.push(d.toLocaleDateString('en-IE', { day: 'numeric', month: 'short' }));
-    data.push(completionPct(disciplineCache[key]));
-  }
-
-  if (completionChartInstance) completionChartInstance.destroy();
-  completionChartInstance = new Chart(canvas, {
-    type: 'bar',
-    data: {
-      labels,
-      datasets: [{
-        data,
-        backgroundColor: data.map(v => v >= 70 ? 'rgba(139,130,240,.6)' : v > 0 ? 'rgba(139,130,240,.25)' : 'rgba(26,26,36,.8)'),
-        borderRadius: 4,
-        borderSkipped: false,
-      }]
-    },
-    options: {
-      responsive: true,
-      plugins: { legend: { display: false }, tooltip: { backgroundColor: '#1a1a24', borderColor: '#222230', borderWidth: 1, callbacks: { label: ctx => ctx.raw + '%' } } },
-      scales: {
-        x: { ticks: { color: '#6a6a80', font: { size: 10 }, maxRotation: 45 }, grid: { display: false } },
-        y: { min: 0, max: 100, ticks: { color: '#6a6a80', callback: v => v + '%' }, grid: { color: 'rgba(34,34,48,.5)' } }
-      }
-    }
+function renderCategoryRadar(){
+  const canvas=document.getElementById('categoryRadarChart');if(!canvas)return;
+  const today=new Date(),wk=[];for(let i=6;i>=0;i--){const d=new Date(today);d.setDate(today.getDate()-i);wk.push(dateStr(d))}
+  const catData=CATS.map(cat=>{
+    const total=cat.habits.length*7;let filled=0;
+    wk.forEach(k=>{const entry=disciplineCache[k]||{};cat.habits.forEach(h=>{
+      const v=entry[h.id];
+      if(h.type==='check'&&v===true)filled++;
+      else if(h.type==='duration'&&v&&parseInt(v)>0)filled++;
+      else if(h.type!=='check'&&h.type!=='duration'&&v&&String(v).trim().length>0)filled++;
+    })});
+    return Math.round((filled/total)*100);
   });
+  if(radarChart)radarChart.destroy();
+  radarChart=new Chart(canvas,{type:'radar',data:{labels:CATS.map(c=>c.name),datasets:[{data:catData,backgroundColor:'rgba(65,102,245,.12)',borderColor:'#4166F5',borderWidth:2,pointBackgroundColor:CATS.map(c=>c.color),pointRadius:4}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{r:{min:0,max:100,ticks:{color:'#6a6a80',backdropColor:'transparent',stepSize:25},grid:{color:'rgba(31,31,48,.5)'},pointLabels:{color:'#9595a8',font:{size:11,family:'Inter'}},angleLines:{color:'rgba(31,31,48,.5)'}}}}});
 }
 
-function renderCategoryRadar() {
-  const canvas = document.getElementById('categoryRadarChart');
-  if (!canvas) return;
-
-  const today = new Date();
-  const weekDates = [];
-  for (let i = 6; i >= 0; i--) {
-    const d = new Date(today);
-    d.setDate(today.getDate() - i);
-    weekDates.push(dateStr(d));
-  }
-
-  const catData = CATS.map(cat => {
-    const checks = cat.habits.filter(h => h.type === 'check');
-    if (!checks.length) return 0;
-    let total = 0;
-    weekDates.forEach(key => {
-      const entry = disciplineCache[key] || {};
-      total += checks.filter(h => entry[h.id]).length;
-    });
-    return Math.round((total / (checks.length * 7)) * 100);
-  });
-
-  if (radarChartInstance) radarChartInstance.destroy();
-  radarChartInstance = new Chart(canvas, {
-    type: 'radar',
-    data: {
-      labels: CATS.map(c => c.name),
-      datasets: [{
-        data: catData,
-        backgroundColor: 'rgba(139,130,240,.15)',
-        borderColor: '#8b82f0',
-        borderWidth: 2,
-        pointBackgroundColor: CATS.map(c => c.color),
-        pointRadius: 5,
-      }]
-    },
-    options: {
-      responsive: true,
-      plugins: { legend: { display: false } },
-      scales: {
-        r: {
-          min: 0, max: 100,
-          ticks: { color: '#6a6a80', backdropColor: 'transparent', stepSize: 25 },
-          grid: { color: 'rgba(34,34,48,.5)' },
-          pointLabels: { color: '#9595a8', font: { size: 12, family: 'Inter' } },
-          angleLines: { color: 'rgba(34,34,48,.5)' }
-        }
-      }
-    }
-  });
+function renderHabitInsights(){
+  const habits=allHabits().filter(h=>h.type==='check');
+  const last30=[],today=new Date();
+  for(let i=29;i>=0;i--){const d=new Date(today);d.setDate(today.getDate()-i);last30.push(dateStr(d))}
+  const counts={};habits.forEach(h=>{counts[h.id]=0});
+  last30.forEach(k=>{const e=disciplineCache[k];if(e)habits.forEach(h=>{if(e[h.id])counts[h.id]++})});
+  const sorted=Object.entries(counts).sort((a,b)=>b[1]-a[1]);
+  const bestH=habits.find(h=>h.id===sorted[0]?.[0]);
+  const worstH=habits.find(h=>h.id===sorted[sorted.length-1]?.[0]);
+  document.getElementById('insightBestHabit').textContent=bestH?bestH.label:'-';
+  document.getElementById('insightWorstHabit').textContent=worstH?worstH.label:'-';
+  const pcts=last30.map(k=>completionPct(disciplineCache[k]));
+  document.getElementById('insight30Avg').textContent=Math.round(pcts.reduce((a,b)=>a+b,0)/pcts.length)+'%';
 }
 
-function renderHabitInsights() {
-  const checkHabits = CATS.flatMap(c => c.habits.filter(h => h.type === 'check'));
-  const allDates = Object.keys(disciplineCache);
-  const last30 = [];
-  const today = new Date();
-  for (let i = 29; i >= 0; i--) {
-    const d = new Date(today);
-    d.setDate(today.getDate() - i);
-    last30.push(dateStr(d));
+// ─── Simulate 30 days of test data ──────────────────────────
+function seedTestData(){
+  if(Object.keys(disciplineCache).length>5)return;
+  const massTimes=['07:00','07:30','08:00','09:00','10:00','07:30','07:30','08:00','07:00','07:30'];
+  const bibleVerses=['John 3:16-21','Psalm 23','Romans 8:28-39','Matthew 5:1-12','Philippians 4:6-7','Isaiah 40:31','Proverbs 3:5-6','1 Corinthians 13','Ephesians 6:10-18','Luke 15:11-32','Genesis 1:1-5','Mark 10:45','Hebrews 11:1','James 1:2-4','Revelation 21:1-4'];
+  const names=['Mum','Dad','John','Sarah','Fr. Thomas','James','Mary','Patrick','Lisa'];
+  const today=new Date();
+  for(let i=30;i>=0;i--){
+    const d=new Date(today);d.setDate(today.getDate()-i);
+    const key=dateStr(d);
+    const isSunday=d.getDay()===0;
+    const r=()=>Math.random();
+    const entry={};
+    if(r()>.2||isSunday)entry.mass=massTimes[Math.floor(r()*massTimes.length)];
+    if(r()>.3)entry.rosary=true;
+    if(r()>.4)entry.adoration=String([15,20,30,30,45,60][Math.floor(r()*6)]);
+    if(r()>.35)entry.dmc=true;
+    if(r()>.25)entry.bible=bibleVerses[Math.floor(r()*bibleVerses.length)];
+    if(r()>.2)entry.prayer=true;
+    if(r()>.5)entry.jy_ministry=true;
+    if(r()>.3)entry.workout=true;
+    entry.breakfast=r()>.15;entry.lunch=r()>.1;entry.dinner=r()>.1;
+    if(r()>.25)entry.replied=true;
+    if(r()>.4)entry.called=names[Math.floor(r()*names.length)];
+    entry.wake_time=['05:30','06:00','06:30','07:00','07:30'][Math.floor(r()*5)];
+    entry.sleep_time=['22:00','22:30','23:00','23:30','00:00'][Math.floor(r()*5)];
+    if(r()>.5)entry.rest_notes=['Good rest','Tired','Slept well','Woke up early','Need more sleep'][Math.floor(r()*5)];
+    if(r()>.35)entry.reading=true;
+    if(r()>.4)entry.project=true;
+    disciplineCache[key]=entry;
   }
-
-  const habitCounts = {};
-  checkHabits.forEach(h => { habitCounts[h.id] = 0; });
-  let daysWithData = 0;
-
-  last30.forEach(key => {
-    const entry = disciplineCache[key];
-    if (entry) {
-      daysWithData++;
-      checkHabits.forEach(h => { if (entry[h.id]) habitCounts[h.id]++; });
-    }
+  lsSet('discipline_log',disciplineCache);
+  const weekLabels=[];for(let i=4;i>=0;i--)weekLabels.push(getWeekLabel(-i));
+  weekLabels.forEach(wk=>{
+    const scores={};DOMAINS.forEach(d=>{scores[d.name]=Math.floor(Math.random()*5)+4});
+    scoreCache[wk]=scores;
   });
-
-  const sorted = Object.entries(habitCounts).sort((a, b) => b[1] - a[1]);
-  const bestId = sorted[0]?.[0];
-  const worstId = sorted[sorted.length - 1]?.[0];
-  const bestHabit = checkHabits.find(h => h.id === bestId);
-  const worstHabit = checkHabits.find(h => h.id === worstId);
-
-  document.getElementById('insightBestHabit').textContent = bestHabit ? bestHabit.label : '-';
-  document.getElementById('insightWorstHabit').textContent = worstHabit ? worstHabit.label : '-';
-
-  const pcts = last30.map(k => completionPct(disciplineCache[k]));
-  const avg = pcts.length ? Math.round(pcts.reduce((a, b) => a + b, 0) / pcts.length) : 0;
-  document.getElementById('insight30Avg').textContent = avg + '%';
+  lsSet('score_log',scoreCache);
 }
 
 // ─── Boot ───────────────────────────────────────────────────
-async function boot() {
-  const [discRows, scoreRows] = await Promise.all([
-    sbFetch('discipline_log', 'GET', null, '?select=date,entry'),
-    sbFetch('score_log', 'GET', null, '?select=week,scores'),
+async function boot(){
+  const[discRows,scoreRows]=await Promise.all([
+    sbFetch('discipline_log','GET',null,'?select=date,entry'),
+    sbFetch('score_log','GET',null,'?select=week,scores'),
   ]);
-
-  if (discRows) {
-    discRows.forEach(r => { disciplineCache[r.date] = r.entry; });
-    lsSet('discipline_log', disciplineCache);
-  }
-  if (scoreRows) {
-    scoreRows.forEach(r => { scoreCache[r.week] = r.scores; });
-    lsSet('score_log', scoreCache);
-  }
-
-  renderDashboard();
-  renderDisciplines();
-  renderScoreSliders();
+  if(discRows){discRows.forEach(r=>{disciplineCache[r.date]=r.entry});lsSet('discipline_log',disciplineCache)}
+  if(scoreRows){scoreRows.forEach(r=>{scoreCache[r.week]=r.scores});lsSet('score_log',scoreCache)}
+  seedTestData();
+  renderDashboard();renderDisciplines();renderScoreSliders();
 }
-
 boot();
 </script>
 </body>
