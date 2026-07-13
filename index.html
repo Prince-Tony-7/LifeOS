@@ -101,7 +101,9 @@ a{color:var(--accent);text-decoration:none}
 
 .heatmap-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px;margin-bottom:24px;overflow-x:auto}
 .heatmap-title{font-size:.9rem;font-weight:600;margin-bottom:14px;display:flex;align-items:center;gap:8px}
-.heatmap{display:flex;gap:3px}
+.heatmap{display:flex;gap:3px;align-items:flex-start}
+.heatmap-labels{display:flex;flex-direction:column;gap:3px;padding-top:0;margin-right:6px}
+.heatmap-labels span{height:13px;font-size:.6rem;color:var(--text3);line-height:13px;text-align:right;min-width:24px}
 .heatmap-week{display:flex;flex-direction:column;gap:3px}
 .heatmap-day{width:13px;height:13px;border-radius:3px;background:var(--surface2);transition:var(--transition);cursor:pointer}
 .heatmap-day:hover{transform:scale(1.4);z-index:2}
@@ -503,6 +505,9 @@ function renderHeatmap(){
   const today=new Date(),start=new Date(today);start.setDate(today.getDate()-16*7+1);
   const sd=start.getDay();if(sd>0)start.setDate(start.getDate()-sd);
   const tooltip=document.getElementById('heatmapTooltip');
+  const labels=document.createElement('div');labels.className='heatmap-labels';
+  ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].forEach((d,i)=>{const s=document.createElement('span');s.textContent=(i%2===1)?d:'';labels.appendChild(s)});
+  hm.appendChild(labels);
   let wkEl=null;const d=new Date(start);
   while(d<=today||d.getDay()!==0){
     if(d.getDay()===0){wkEl=document.createElement('div');wkEl.className='heatmap-week';hm.appendChild(wkEl)}
