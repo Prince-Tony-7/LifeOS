@@ -875,46 +875,6 @@ function renderHabitInsights(){
   document.getElementById('insight30Avg').textContent=Math.round(pcts.reduce((a,b)=>a+b,0)/pcts.length)+'%';
 }
 
-// ─── Simulate 30 days of test data ──────────────────────────
-function seedTestData(){
-  if(Object.keys(disciplineCache).length>5)return;
-  const massTimes=['07:00','07:30','08:00','09:00','10:00','07:30','07:30','08:00','07:00','07:30'];
-  const bibleVerses=['John 3:16-21','Psalm 23','Romans 8:28-39','Matthew 5:1-12','Philippians 4:6-7','Isaiah 40:31','Proverbs 3:5-6','1 Corinthians 13','Ephesians 6:10-18','Luke 15:11-32','Genesis 1:1-5','Mark 10:45','Hebrews 11:1','James 1:2-4','Revelation 21:1-4'];
-  const names=['Mum','Dad','John','Sarah','Fr. Thomas','James','Mary','Patrick','Lisa'];
-  const today=new Date();
-  for(let i=30;i>=0;i--){
-    const d=new Date(today);d.setDate(today.getDate()-i);
-    const key=dateStr(d);
-    const isSunday=d.getDay()===0;
-    const r=()=>Math.random();
-    const entry={};
-    if(r()>.2||isSunday)entry.mass=massTimes[Math.floor(r()*massTimes.length)];
-    if(r()>.3)entry.rosary=true;
-    if(r()>.4)entry.adoration=String([15,20,30,30,45,60][Math.floor(r()*6)]);
-    if(r()>.35)entry.dmc=true;
-    if(r()>.25)entry.bible=bibleVerses[Math.floor(r()*bibleVerses.length)];
-    if(r()>.2)entry.prayer=true;
-    if(r()>.5)entry.jy_ministry=true;
-    if(r()>.3)entry.workout=true;
-    entry.breakfast=r()>.15;entry.lunch=r()>.1;entry.dinner=r()>.1;
-    if(r()>.25)entry.replied=true;
-    if(r()>.4)entry.called=names[Math.floor(r()*names.length)];
-    entry.wake_time=['05:30','06:00','06:30','07:00','07:30'][Math.floor(r()*5)];
-    entry.sleep_time=['22:00','22:30','23:00','23:30','00:00'][Math.floor(r()*5)];
-    if(r()>.5)entry.rest_notes=['Good rest','Tired','Slept well','Woke up early','Need more sleep'][Math.floor(r()*5)];
-    if(r()>.35)entry.reading=true;
-    if(r()>.4)entry.project=true;
-    disciplineCache[key]=entry;
-  }
-  lsSet('discipline_log',disciplineCache);
-  const weekLabels=[];for(let i=4;i>=0;i--)weekLabels.push(getWeekLabel(-i));
-  weekLabels.forEach(wk=>{
-    const scores={};DOMAINS.forEach(d=>{scores[d.name]=Math.floor(Math.random()*5)+4});
-    scoreCache[wk]=scores;
-  });
-  lsSet('score_log',scoreCache);
-}
-
 // ─── Boot ───────────────────────────────────────────────────
 async function boot(){
   const[discRows,scoreRows]=await Promise.all([
@@ -923,7 +883,6 @@ async function boot(){
   ]);
   if(discRows){discRows.forEach(r=>{disciplineCache[r.date]=r.entry});lsSet('discipline_log',disciplineCache)}
   if(scoreRows){scoreRows.forEach(r=>{scoreCache[r.week]=r.scores});lsSet('score_log',scoreCache)}
-  seedTestData();
   renderDashboard();renderDisciplines();renderScoreSliders();
 }
 boot();
