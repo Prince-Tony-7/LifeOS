@@ -881,8 +881,8 @@ async function boot(){
     sbFetch('discipline_log','GET',null,'?select=date,entry'),
     sbFetch('score_log','GET',null,'?select=week,scores'),
   ]);
-  if(discRows){discRows.forEach(r=>{disciplineCache[r.date]=r.entry});lsSet('discipline_log',disciplineCache)}
-  if(scoreRows){scoreRows.forEach(r=>{scoreCache[r.week]=r.scores});lsSet('score_log',scoreCache)}
+  if(discRows){disciplineCache={};discRows.forEach(r=>{disciplineCache[r.date]=r.entry});lsSet('discipline_log',disciplineCache)}
+  if(scoreRows){scoreCache={};scoreRows.forEach(r=>{scoreCache[r.week]=r.scores});lsSet('score_log',scoreCache)}
   renderDashboard();renderDisciplines();renderScoreSliders();
 }
 boot();
