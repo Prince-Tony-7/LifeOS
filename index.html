@@ -266,10 +266,11 @@ a{color:var(--accent);text-decoration:none}
     <div class="hero-stat"><div class="hero-stat-label">This Week Avg</div><div class="hero-stat-value" id="dashWeekAvg">0%</div><div class="hero-stat-sub">completion</div></div>
     <div class="hero-stat"><div class="hero-stat-label">Days Logged</div><div class="hero-stat-value" id="dashTotalDays">0</div><div class="hero-stat-sub">entries</div></div>
   </div>
-  <div class="hero-stats" style="grid-template-columns:repeat(3,1fr);margin-bottom:24px">
+  <div class="hero-stats" style="margin-bottom:24px">
     <div class="hero-stat"><div class="hero-stat-label">Most Common Mass Time</div><div class="hero-stat-value" id="dashMassMode" style="font-size:1.6rem">-</div><div class="hero-stat-sub">mode across all entries</div></div>
     <div class="hero-stat"><div class="hero-stat-label">Avg Adoration Duration</div><div class="hero-stat-value" id="dashAdorationAvg" style="font-size:1.6rem">-</div><div class="hero-stat-sub">minutes per visit</div></div>
     <div class="hero-stat"><div class="hero-stat-label">Total Adoration</div><div class="hero-stat-value" id="dashAdorationTotal" style="font-size:1.6rem">-</div><div class="hero-stat-sub">all-time hours</div></div>
+    <div class="hero-stat"><div class="hero-stat-label">Longest Sitting</div><div class="hero-stat-value" id="dashAdorationBest" style="font-size:1.6rem">-</div><div class="hero-stat-sub">personal best</div></div>
   </div>
   <div class="heatmap-wrap">
     <div class="heatmap-title"><span>Discipline Heatmap</span><span style="font-size:.7rem;color:var(--text3);font-weight:400;margin-left:auto">Last 16 weeks</span></div>
@@ -482,6 +483,11 @@ function calcAdorationTotal(){
   Object.values(disciplineCache).forEach(e=>{if(e.adoration&&parseInt(e.adoration)>0)sum+=parseInt(e.adoration)});
   return sum;
 }
+function calcAdorationBest(){
+  let best=0;
+  Object.values(disciplineCache).forEach(e=>{if(e.adoration&&parseInt(e.adoration)>best)best=parseInt(e.adoration)});
+  return best;
+}
 
 // ─── Dashboard ──────────────────────────────────────────────
 function renderDashboard(){
@@ -511,6 +517,10 @@ function renderDashboard(){
   const totalMin=calcAdorationTotal();
   const totalEl=document.getElementById('dashAdorationTotal');
   if(totalMin>=60){const h=Math.floor(totalMin/60),m=totalMin%60;totalEl.textContent=m?h+'h '+m+'m':h+'h'}else{totalEl.textContent=totalMin?totalMin+'m':'-'}
+  const bestMin=calcAdorationBest();
+  const bestEl=document.getElementById('dashAdorationBest');
+  if(bestMin>=60){const h=Math.floor(bestMin/60),m=bestMin%60;bestEl.textContent=m?h+'h '+m+'m':h+'h'}else{bestEl.textContent=bestMin?bestMin+'m':'-'}
+  bestEl.style.color=bestMin>=60?'var(--green)':bestMin>=30?'var(--yellow)':'var(--red)';
   renderHeatmap();renderLast7Days();renderDashboardCards();
 }
 
