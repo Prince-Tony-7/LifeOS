@@ -211,10 +211,58 @@ a{color:var(--accent);text-decoration:none}
 .month-bar-label{font-size:.65rem;color:var(--text3);margin-top:4px}
 .month-bar-pct{font-size:.7rem;color:var(--text2);font-weight:600;margin-top:2px}
 
+/* Finance Tracker */
+.fin-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+.fin-summary-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px;position:relative;overflow:hidden}
+.fin-summary-card::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;opacity:.5}
+.fin-summary-card.income::after{background:var(--green)}.fin-summary-card.expenses::after{background:var(--red)}
+.fin-summary-card.savings::after{background:#8b82f0}.fin-summary-card.remaining::after{background:var(--accent)}
+.fin-card-label{font-size:.7rem;text-transform:uppercase;letter-spacing:.8px;color:var(--text3);font-weight:600;margin-bottom:6px}
+.fin-card-value{font-family:var(--font-display);font-size:2rem;font-weight:700;line-height:1}
+.fin-savings-bar{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 18px;margin-bottom:20px;display:flex;align-items:center;gap:14px}
+.fin-savings-track{flex:1;height:8px;background:var(--surface2);border-radius:4px;overflow:hidden}
+.fin-savings-fill{height:100%;border-radius:4px;transition:width .4s ease}
+.fin-savings-pct{font-family:var(--font-display);font-size:1.1rem;font-weight:700;min-width:48px;text-align:right}
+.fin-savings-label{font-size:.78rem;color:var(--text2)}
+.fin-tab-content{display:none}.fin-tab-content.active{display:block}
+.fin-entry{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--border);transition:var(--transition)}
+.fin-entry:last-child{border-bottom:none}
+.fin-entry:hover{background:var(--surface2)}
+.fin-entry-label{flex:1;font-size:.85rem}
+.fin-entry-amount{font-family:var(--font-display);font-size:1.1rem;font-weight:700}
+.fin-delete{background:none;border:none;color:var(--text3);cursor:pointer;font-size:1rem;padding:4px 8px;border-radius:var(--radius-xs);transition:var(--transition)}
+.fin-delete:hover{color:var(--red);background:var(--red-dim)}
+.fin-add-form{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-top:12px;display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end}
+.fin-add-form input,.fin-add-form select{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xs);color:var(--text);padding:8px 12px;font-size:.85rem;font-family:var(--font-body)}
+.fin-add-form input:focus,.fin-add-form select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-glow)}
+.fin-add-form select{cursor:pointer}
+.fin-form-btn{padding:8px 18px;border-radius:var(--radius-xs);border:none;font-size:.82rem;font-weight:600;cursor:pointer;transition:var(--transition);font-family:var(--font-body)}
+.fin-form-btn.primary{background:var(--accent);color:#fff}.fin-form-btn.primary:hover{background:var(--accent2)}
+.fin-form-btn.cancel{background:var(--surface);color:var(--text2);border:1px solid var(--border)}.fin-form-btn.cancel:hover{color:var(--text)}
+.fin-cat-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:12px}
+.fin-cat-header{padding:12px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border)}
+.fin-cat-name{font-size:.82rem;font-weight:600;display:flex;align-items:center;gap:8px}
+.fin-cat-total{font-family:var(--font-display);font-size:1rem;font-weight:700}
+.fin-breakdown-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)}
+.fin-breakdown-row:last-child{border-bottom:none}
+.fin-breakdown-bar{width:60px;height:4px;background:var(--surface2);border-radius:2px;overflow:hidden}
+.fin-breakdown-fill{height:100%;border-radius:2px}
+.debt-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px;margin-bottom:12px;position:relative;overflow:hidden}
+.debt-card-bar{position:absolute;bottom:0;left:0;right:0;height:3px;background:var(--red);opacity:.5}
+.debt-name{font-weight:600;font-size:.95rem;margin-bottom:8px}
+.debt-balance{font-family:var(--font-display);font-size:1.6rem;font-weight:700;color:var(--red);margin-bottom:8px}
+.debt-detail{font-size:.78rem;color:var(--text2);margin-bottom:4px}
+.debt-payoff{font-size:.78rem;color:var(--text3);margin-top:8px;padding-top:8px;border-top:1px solid var(--border)}
+.fin-total-bar{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 18px;margin-top:16px;display:flex;justify-content:space-between;align-items:center}
+.fin-total-label{font-size:.85rem;font-weight:600;color:var(--text2)}
+.fin-total-value{font-family:var(--font-display);font-size:1.4rem;font-weight:700}
+.fin-empty{text-align:center;padding:40px 20px;color:var(--text3);font-size:.9rem;line-height:1.6}
+
 @media(max-width:768px){
   .sidebar{transform:translateX(-100%)}.sidebar.open{transform:translateX(0)}.hamburger{display:block}.overlay.open{display:block}
   .main{margin-left:0;padding:14px;padding-top:54px}
   .hero-stats{grid-template-columns:repeat(2,1fr)}
+  .fin-summary{grid-template-columns:repeat(2,1fr)}
   .cards-grid,.score-grid,.info-grid{grid-template-columns:1fr}
   .cat-progress-grid{grid-template-columns:repeat(2,1fr)}
   .streak-milestones{display:none}
@@ -241,6 +289,8 @@ a{color:var(--accent);text-decoration:none}
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>Daily Disciplines</button>
   <button class="nav-link" onclick="showPage('scores',this)">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>Weekly Scores</button>
+  <button class="nav-link" onclick="showPage('finance',this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>Finance Tracker</button>
   <button class="nav-link" onclick="showPage('insights',this)">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>Insights</button>
   <div class="sidebar-footer">
@@ -334,6 +384,62 @@ a{color:var(--accent);text-decoration:none}
   <div id="scoreTrends" style="display:none"><div class="chart-container"><canvas id="trendsChart"></canvas></div><h3 style="font-size:.9rem;font-weight:600;margin-bottom:12px;color:var(--text2)">Week-on-Week Delta</h3><div class="delta-grid" id="deltaGrid"></div></div>
 </div>
 
+<!-- ══════════ FINANCE TRACKER ══════════ -->
+<div class="page" id="page-finance">
+  <div class="page-header">
+    <div><h1 class="page-title">Finance Tracker</h1><p class="page-subtitle">Track income, expenses, savings and debt honestly.</p></div>
+    <div class="date-nav" style="margin-bottom:0">
+      <button class="nav-btn" onclick="changeFinMonth(-1)">&larr;</button>
+      <div class="date-label" id="finMonthLabel" style="min-width:140px"></div>
+      <button class="nav-btn" onclick="changeFinMonth(1)">&rarr;</button>
+    </div>
+  </div>
+  <div class="fin-summary">
+    <div class="fin-summary-card income"><div class="fin-card-label">Income</div><div class="fin-card-value" id="finIncome" style="color:var(--green)">€0</div></div>
+    <div class="fin-summary-card expenses"><div class="fin-card-label">Expenses</div><div class="fin-card-value" id="finExpenses" style="color:var(--red)">€0</div></div>
+    <div class="fin-summary-card savings"><div class="fin-card-label">Savings</div><div class="fin-card-value" id="finSavings" style="color:#8b82f0">€0</div></div>
+    <div class="fin-summary-card remaining"><div class="fin-card-label">Remaining</div><div class="fin-card-value" id="finRemaining">€0</div></div>
+  </div>
+  <div class="fin-savings-bar" id="finSavingsBar" style="display:none">
+    <div class="fin-savings-label">Savings Rate</div>
+    <div class="fin-savings-track"><div class="fin-savings-fill" id="finSavingsFill"></div></div>
+    <div class="fin-savings-pct" id="finSavingsPct">0%</div>
+  </div>
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="showFinTab('overview',this)">Overview</button>
+    <button class="tab-btn" onclick="showFinTab('income',this)">Income</button>
+    <button class="tab-btn" onclick="showFinTab('expenses',this)">Expenses</button>
+    <button class="tab-btn" onclick="showFinTab('debts',this)">Debts</button>
+  </div>
+  <div class="fin-tab-content active" id="finTabOverview">
+    <div class="chart-container"><div style="font-size:.9rem;font-weight:600;margin-bottom:14px">Last 6 Months</div><canvas id="finOverviewChart"></canvas></div>
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px">
+      <div style="font-size:.85rem;font-weight:600;margin-bottom:10px">Expense Breakdown</div>
+      <div id="finBreakdown"></div>
+    </div>
+  </div>
+  <div class="fin-tab-content" id="finTabIncome">
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden">
+      <div id="finIncomeList"></div>
+    </div>
+    <div class="fin-total-bar"><span class="fin-total-label">Total Income</span><span class="fin-total-value" id="finIncomeTotal" style="color:var(--green)">€0</span></div>
+    <div id="finIncomeFormWrap" style="margin-top:12px"></div>
+    <button class="save-btn" id="finAddIncomeBtn" onclick="showFinForm('income')" style="margin-top:12px">+ Add Income</button>
+  </div>
+  <div class="fin-tab-content" id="finTabExpenses">
+    <div id="finExpensesList"></div>
+    <div class="fin-total-bar"><span class="fin-total-label">Total Expenses (excl. savings)</span><span class="fin-total-value" id="finExpensesTotal" style="color:var(--red)">€0</span></div>
+    <div id="finExpenseFormWrap" style="margin-top:12px"></div>
+    <button class="save-btn" id="finAddExpenseBtn" onclick="showFinForm('expense')" style="margin-top:12px">+ Add Expense</button>
+  </div>
+  <div class="fin-tab-content" id="finTabDebts">
+    <div class="fin-total-bar" id="finDebtTotalBar" style="display:none;margin-top:0;margin-bottom:16px"><span class="fin-total-label">Total Debt Balance</span><span class="fin-total-value" id="finDebtTotal" style="color:var(--red)">€0</span></div>
+    <div id="finDebtsList"></div>
+    <div id="finDebtFormWrap" style="margin-top:12px"></div>
+    <button class="save-btn" id="finAddDebtBtn" onclick="showFinForm('debt')" style="margin-top:12px">+ Add Debt</button>
+  </div>
+</div>
+
 <!-- ══════════ INSIGHTS ══════════ -->
 <div class="page" id="page-insights">
   <div class="page-header"><div><h1 class="page-title">Insights</h1><p class="page-subtitle">Patterns and progress over time</p></div></div>
@@ -379,6 +485,7 @@ function showPage(id,btn){
   if(id==='dashboard')renderDashboard();
   if(id==='disciplines')renderDisciplines();
   if(id==='scores'){renderScoreSliders();renderAllCharts()}
+  if(id==='finance')renderFinance();
   if(id==='insights')renderInsights();
   if(window.innerWidth<=768)toggleSidebar();
 }
@@ -905,6 +1012,205 @@ function renderHabitInsights(){
   const pcts=last30.map(k=>completionPct(disciplineCache[k]));
   document.getElementById('insight30Avg').textContent=Math.round(pcts.reduce((a,b)=>a+b,0)/pcts.length)+'%';
 }
+
+// ─── Finance Tracker ────────────────────────────────────────
+const FIN_CATS=[
+  {id:'housing',label:'Housing',emoji:'🏠',color:'#5090e0'},
+  {id:'food',label:'Food',emoji:'🍽️',color:'#e0a030'},
+  {id:'transport',label:'Transport',emoji:'🚌',color:'#34c48a'},
+  {id:'debt_repayment',label:'Debt repayment',emoji:'💳',color:'#e06050'},
+  {id:'family_support',label:'Family support',emoji:'👨‍👩‍👧',color:'#d060a0'},
+  {id:'subscriptions',label:'Subscriptions',emoji:'📱',color:'#8b82f0'},
+  {id:'health',label:'Health',emoji:'🏊',color:'#60b040'},
+  {id:'ministry',label:'Ministry',emoji:'✝️',color:'#a070d0'},
+  {id:'personal',label:'Personal',emoji:'🛍️',color:'#7a7890'},
+  {id:'savings',label:'Savings',emoji:'💰',color:'#1aaa6a'},
+];
+let finMonthOffset=0,finOverviewChart=null;
+function finId(){return Math.random().toString(36).slice(2,9)}
+function finMonthKey(offset){const d=new Date();d.setMonth(d.getMonth()+(offset||0));return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')}
+function finMonthLabel(key){const[y,m]=key.split('-');return new Date(y,m-1).toLocaleDateString('en-IE',{month:'long',year:'numeric'})}
+function finGetAll(){return JSON.parse(localStorage.getItem('pt_fin_all')||'{}')}
+function finSetAll(d){localStorage.setItem('pt_fin_all',JSON.stringify(d))}
+function finGetDebts(){return JSON.parse(localStorage.getItem('pt_fin_debts')||'[]')}
+function finSetDebts(d){localStorage.setItem('pt_fin_debts',JSON.stringify(d))}
+function finGetMonth(key){const all=finGetAll();return all[key]||{income:[],expenses:[]}}
+function finSaveMonth(key,data){const all=finGetAll();all[key]=data;finSetAll(all)}
+
+function changeFinMonth(delta){finMonthOffset+=delta;renderFinance()}
+
+function showFinTab(tab,btn){
+  document.querySelectorAll('#page-finance .tab-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  ['Overview','Income','Expenses','Debts'].forEach(t=>{document.getElementById('finTab'+t).classList.remove('active')});
+  document.getElementById('finTab'+tab.charAt(0).toUpperCase()+tab.slice(1)).classList.add('active');
+}
+
+function renderFinance(){
+  const key=finMonthKey(finMonthOffset);
+  document.getElementById('finMonthLabel').textContent=finMonthLabel(key);
+  const data=finGetMonth(key);
+  const totalIncome=data.income.reduce((s,e)=>s+e.amount,0);
+  const savingsEntries=data.expenses.filter(e=>e.category==='savings');
+  const totalSavings=savingsEntries.reduce((s,e)=>s+e.amount,0);
+  const totalExpenses=data.expenses.filter(e=>e.category!=='savings').reduce((s,e)=>s+e.amount,0);
+  const remaining=totalIncome-totalExpenses-totalSavings;
+
+  document.getElementById('finIncome').textContent='€'+totalIncome.toLocaleString();
+  document.getElementById('finExpenses').textContent='€'+totalExpenses.toLocaleString();
+  document.getElementById('finSavings').textContent='€'+totalSavings.toLocaleString();
+  const remEl=document.getElementById('finRemaining');
+  remEl.textContent=(remaining<0?'-€':'€')+Math.abs(remaining).toLocaleString();
+  remEl.style.color=remaining>=0?'var(--green)':'var(--red)';
+
+  const savBar=document.getElementById('finSavingsBar');
+  if(totalIncome>0){
+    savBar.style.display='';
+    const rate=Math.round((totalSavings/totalIncome)*100);
+    document.getElementById('finSavingsFill').style.width=Math.min(rate,100)+'%';
+    document.getElementById('finSavingsFill').style.background=rate>=20?'var(--green)':'var(--yellow)';
+    document.getElementById('finSavingsPct').textContent=rate+'%';
+    document.getElementById('finSavingsPct').style.color=rate>=20?'var(--green)':'var(--yellow)';
+  }else{savBar.style.display='none'}
+
+  renderFinIncome(data,key);
+  renderFinExpenses(data,key);
+  renderFinDebts();
+  renderFinOverview(key);
+  renderFinBreakdown(data);
+}
+
+function renderFinIncome(data,key){
+  const list=document.getElementById('finIncomeList');
+  if(!data.income.length){list.innerHTML='<div class="fin-empty">No income entries this month.</div>';
+  }else{list.innerHTML=data.income.map(e=>`<div class="fin-entry"><span class="fin-entry-label">${e.label}</span><span class="fin-entry-amount" style="color:var(--green)">€${e.amount.toLocaleString()}</span><button class="fin-delete" onclick="finDeleteIncome('${key}','${e.id}')">✕</button></div>`).join('')}
+  document.getElementById('finIncomeTotal').textContent='€'+data.income.reduce((s,e)=>s+e.amount,0).toLocaleString();
+}
+
+function renderFinExpenses(data,key){
+  const container=document.getElementById('finExpensesList');
+  const nonSavings=data.expenses.filter(e=>e.category!=='savings');
+  const byCat={};
+  data.expenses.forEach(e=>{if(!byCat[e.category])byCat[e.category]=[];byCat[e.category].push(e)});
+  let html='';
+  FIN_CATS.forEach(cat=>{
+    const entries=byCat[cat.id];if(!entries||!entries.length)return;
+    const catTotal=entries.reduce((s,e)=>s+e.amount,0);
+    html+=`<div class="fin-cat-section"><div class="fin-cat-header"><span class="fin-cat-name" style="color:${cat.color}">${cat.emoji} ${cat.label}</span><span class="fin-cat-total" style="color:${cat.color}">€${catTotal.toLocaleString()}</span></div>`;
+    entries.forEach(e=>{html+=`<div class="fin-entry"><span class="fin-entry-label">${e.label}</span><span class="fin-entry-amount">€${e.amount.toLocaleString()}</span><button class="fin-delete" onclick="finDeleteExpense('${key}','${e.id}')">✕</button></div>`});
+    html+='</div>';
+  });
+  container.innerHTML=html||'<div class="fin-empty">No expenses this month.</div>';
+  document.getElementById('finExpensesTotal').textContent='€'+nonSavings.reduce((s,e)=>s+e.amount,0).toLocaleString();
+}
+
+function renderFinDebts(){
+  const debts=finGetDebts();
+  const list=document.getElementById('finDebtsList');
+  const totalBar=document.getElementById('finDebtTotalBar');
+  if(!debts.length){
+    list.innerHTML='<div class="fin-empty">Add your debts here.<br>This is the most important tab to fill in honestly.</div>';
+    totalBar.style.display='none';
+  }else{
+    const totalDebt=debts.reduce((s,d)=>s+d.balance,0);
+    document.getElementById('finDebtTotal').textContent='€'+totalDebt.toLocaleString();
+    totalBar.style.display='';
+    list.innerHTML=debts.map(d=>{
+      const months=d.minPayment>0?Math.ceil(d.balance/d.minPayment):null;
+      return `<div class="debt-card"><button class="fin-delete" style="position:absolute;top:10px;right:10px" onclick="finDeleteDebt('${d.id}')">✕</button><div class="debt-name">${d.label}</div><div class="debt-balance">€${d.balance.toLocaleString()}</div>${d.minPayment?'<div class="debt-detail">Min payment: €'+d.minPayment.toLocaleString()+'/mo</div>':''}${d.apr?'<div class="debt-detail">APR: '+d.apr+'%</div>':''}${months?'<div class="debt-payoff">~'+months+' month'+(months!==1?'s':'')+' at minimum payment</div>':''}<div class="debt-card-bar"></div></div>`
+    }).join('');
+  }
+}
+
+function renderFinOverview(currentKey){
+  const canvas=document.getElementById('finOverviewChart');if(!canvas||!chartsReady)return;
+  const keys=[];for(let i=5;i>=0;i--)keys.push(finMonthKey(finMonthOffset-i));
+  const hasData=keys.some(k=>{const m=finGetMonth(k);return m.income.length||m.expenses.length});
+  if(!hasData){
+    if(finOverviewChart){finOverviewChart.destroy();finOverviewChart=null}
+    canvas.parentElement.querySelector('div').nextElementSibling?.remove();
+    canvas.style.display='none';
+    canvas.insertAdjacentHTML('afterend','<div class="fin-empty" id="finOverviewEmpty">Add income and expenses to see your overview.</div>');
+    return;
+  }
+  canvas.style.display='';
+  const emptyEl=document.getElementById('finOverviewEmpty');if(emptyEl)emptyEl.remove();
+  const labels=keys.map(k=>finMonthLabel(k).split(' ')[0]);
+  const incData=[],expData=[],savData=[];
+  keys.forEach(k=>{const m=finGetMonth(k);incData.push(m.income.reduce((s,e)=>s+e.amount,0));expData.push(m.expenses.filter(e=>e.category!=='savings').reduce((s,e)=>s+e.amount,0));savData.push(m.expenses.filter(e=>e.category==='savings').reduce((s,e)=>s+e.amount,0))});
+  if(finOverviewChart)finOverviewChart.destroy();
+  finOverviewChart=new Chart(canvas,{type:'bar',data:{labels,datasets:[
+    {label:'Income',data:incData,backgroundColor:'rgba(74,222,128,.7)',borderRadius:4},
+    {label:'Expenses',data:expData,backgroundColor:'rgba(248,113,113,.7)',borderRadius:4},
+    {label:'Savings',data:savData,backgroundColor:'rgba(26,170,106,.7)',borderRadius:4},
+  ]},options:{responsive:true,plugins:{legend:{labels:{color:'#9595a8',font:{family:'Inter',size:11},usePointStyle:true,pointStyle:'circle'}},tooltip:{backgroundColor:'#181824',borderColor:'#1f1f30',borderWidth:1,padding:10,cornerRadius:8,callbacks:{label:c=>'€'+c.raw.toLocaleString()}}},scales:{x:{ticks:{color:'#6a6a80',font:{size:10}},grid:{display:false}},y:{ticks:{color:'#6a6a80',callback:v=>'€'+v.toLocaleString()},grid:{color:'rgba(31,31,48,.5)'}}}}});
+}
+
+function renderFinBreakdown(data){
+  const container=document.getElementById('finBreakdown');
+  const nonSavings=data.expenses.filter(e=>e.category!=='savings');
+  const total=nonSavings.reduce((s,e)=>s+e.amount,0);
+  if(!total){container.innerHTML='<div style="color:var(--text3);font-size:.82rem">No expenses to break down.</div>';return}
+  const byCat={};nonSavings.forEach(e=>{byCat[e.category]=(byCat[e.category]||0)+e.amount});
+  const sorted=Object.entries(byCat).sort((a,b)=>b[1]-a[1]);
+  container.innerHTML=sorted.map(([catId,amt])=>{
+    const cat=FIN_CATS.find(c=>c.id===catId)||{label:catId,emoji:'',color:'var(--text2)'};
+    const pct=Math.round((amt/total)*100);
+    return `<div class="fin-breakdown-row"><span style="font-size:.82rem;flex:1">${cat.emoji} ${cat.label}</span><div class="fin-breakdown-bar"><div class="fin-breakdown-fill" style="width:${pct}%;background:${cat.color}"></div></div><span style="font-size:.78rem;color:var(--text2);width:50px;text-align:right">€${amt.toLocaleString()}</span><span style="font-size:.72rem;color:var(--text3);width:36px;text-align:right">${pct}%</span></div>`;
+  }).join('');
+}
+
+function showFinForm(type){
+  if(type==='income'){
+    document.getElementById('finAddIncomeBtn').style.display='none';
+    document.getElementById('finIncomeFormWrap').innerHTML=`<div class="fin-add-form"><input type="text" id="finIncSrc" placeholder="Income source (e.g. Meditec Salary)" style="flex:1;min-width:180px"><input type="number" id="finIncAmt" placeholder="€ Amount" style="width:120px" min="0"><button class="fin-form-btn primary" onclick="finAddIncome()">Add</button><button class="fin-form-btn cancel" onclick="finCancelForm('income')">Cancel</button></div>`;
+    document.getElementById('finIncSrc').focus();
+  }else if(type==='expense'){
+    document.getElementById('finAddExpenseBtn').style.display='none';
+    const opts=FIN_CATS.map(c=>`<option value="${c.id}">${c.emoji} ${c.label}</option>`).join('');
+    document.getElementById('finExpenseFormWrap').innerHTML=`<div class="fin-add-form"><select id="finExpCat" style="min-width:160px">${opts}</select><input type="text" id="finExpDesc" placeholder="Description" style="flex:1;min-width:140px"><input type="number" id="finExpAmt" placeholder="€ Amount" style="width:120px" min="0"><button class="fin-form-btn primary" onclick="finAddExpense()">Add</button><button class="fin-form-btn cancel" onclick="finCancelForm('expense')">Cancel</button></div>`;
+    document.getElementById('finExpDesc').focus();
+  }else if(type==='debt'){
+    document.getElementById('finAddDebtBtn').style.display='none';
+    document.getElementById('finDebtFormWrap').innerHTML=`<div class="fin-add-form"><input type="text" id="finDebtName" placeholder="Debt name (e.g. Credit card)" style="flex:1;min-width:180px"><input type="number" id="finDebtBal" placeholder="Balance €" style="width:110px" min="0"><input type="number" id="finDebtMin" placeholder="Min payment €/mo" style="width:130px" min="0"><input type="number" id="finDebtApr" placeholder="APR %" style="width:90px" min="0" step="0.1"><button class="fin-form-btn primary" onclick="finAddDebt()">Add Debt</button><button class="fin-form-btn cancel" onclick="finCancelForm('debt')">Cancel</button></div>`;
+    document.getElementById('finDebtName').focus();
+  }
+}
+function finCancelForm(type){
+  if(type==='income'){document.getElementById('finIncomeFormWrap').innerHTML='';document.getElementById('finAddIncomeBtn').style.display=''}
+  else if(type==='expense'){document.getElementById('finExpenseFormWrap').innerHTML='';document.getElementById('finAddExpenseBtn').style.display=''}
+  else{document.getElementById('finDebtFormWrap').innerHTML='';document.getElementById('finAddDebtBtn').style.display=''}
+}
+
+function finAddIncome(){
+  const label=document.getElementById('finIncSrc').value.trim();
+  const amount=parseFloat(document.getElementById('finIncAmt').value);
+  if(!label||!amount||amount<=0){toast('Enter source and amount','error');return}
+  const key=finMonthKey(finMonthOffset),data=finGetMonth(key);
+  data.income.push({id:finId(),label,amount});
+  finSaveMonth(key,data);finCancelForm('income');renderFinance();toast('Income added','success');
+}
+function finAddExpense(){
+  const category=document.getElementById('finExpCat').value;
+  const label=document.getElementById('finExpDesc').value.trim();
+  const amount=parseFloat(document.getElementById('finExpAmt').value);
+  if(!label||!amount||amount<=0){toast('Enter description and amount','error');return}
+  const key=finMonthKey(finMonthOffset),data=finGetMonth(key);
+  data.expenses.push({id:finId(),label,amount,category});
+  finSaveMonth(key,data);finCancelForm('expense');renderFinance();toast('Expense added','success');
+}
+function finAddDebt(){
+  const label=document.getElementById('finDebtName').value.trim();
+  const balance=parseFloat(document.getElementById('finDebtBal').value);
+  if(!label||!balance||balance<=0){toast('Enter name and balance','error');return}
+  const minPayment=parseFloat(document.getElementById('finDebtMin').value)||0;
+  const apr=parseFloat(document.getElementById('finDebtApr').value)||0;
+  const debts=finGetDebts();debts.push({id:finId(),label,balance,minPayment,apr});
+  finSetDebts(debts);finCancelForm('debt');renderFinance();toast('Debt added','success');
+}
+function finDeleteIncome(key,id){const data=finGetMonth(key);data.income=data.income.filter(e=>e.id!==id);finSaveMonth(key,data);renderFinance()}
+function finDeleteExpense(key,id){const data=finGetMonth(key);data.expenses=data.expenses.filter(e=>e.id!==id);finSaveMonth(key,data);renderFinance()}
+function finDeleteDebt(id){finSetDebts(finGetDebts().filter(d=>d.id!==id));renderFinance()}
 
 // ─── Boot ───────────────────────────────────────────────────
 async function boot(){
