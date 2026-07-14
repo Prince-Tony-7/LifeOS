@@ -1111,8 +1111,18 @@ function finBalanceThrough(key){
 }
 function finOrdinal(n){const s=['th','st','nd','rd'],v=n%100;return n+(s[(v-20)%10]||s[v]||s[0])}
 function finRecurDay(r){return r.date?parseInt(r.date.slice(8,10)):(r.day||1)}
-// Turn recurring templates into real ledger entries for each month from their
-// start month up to the current month. Idempotent via a per-month "applied" list.
+function finDaysInMonth(key){const[y,m]=key.split('-').map(Number);return new Date(y,m,0).getDate()}
+// A recurring item posts to a month only once its date has actually arrived:
+// every day in a fully-past month, today-or-earlier in the current month,
+// and never in a future month.
+function finDateHasArrived(key,day){
+  const cur=finMonthKey(0),effDay=Math.min(day,finDaysInMonth(key));
+  if(key<cur)return true;
+  if(key>cur)return false;
+  return new Date().getDate()>=effDay;
+}
+// Turn recurring templates into real ledger entries, but only from the date each
+// item actually hits. Idempotent via a per-month "applied" list.
 function finMaterializeMonth(key){
   const rec=finGetRecurring();if(!rec.length)return false;
   const data=finGetMonth(key);
@@ -1123,7 +1133,9 @@ function finMaterializeMonth(key){
     if(rStart&&key<rStart)return;
     if(data.applied.includes(r.id))return;
     const day=finRecurDay(r);
-    const entry={id:finId(),label:r.label,amount:r.amount,recurId:r.id,date:key+'-'+String(day).padStart(2,'0')};
+    if(!finDateHasArrived(key,day))return;
+    const effDay=Math.min(day,finDaysInMonth(key));
+    const entry={id:finId(),label:r.label,amount:r.amount,recurId:r.id,date:key+'-'+String(effDay).padStart(2,'0')};
     if(r.type==='income')data.income.push(entry);
     else{entry.category=r.category;data.expenses.push(entry)}
     data.applied.push(r.id);changed=true;
@@ -1163,20 +1175,18 @@ function finCalc(key){
 }
 
 function renderFinance(){
+  finMaterializeThroughCurrent();
   const key=finMonthKey(finMonthOffset);
   document.getElementById('finMonthLabel').textContent=finMonthLabel(key);
   const{data,totalIncome,totalSavings,totalExpenses,remaining,savingsRate}=finCalc(key);
-  const carryIn=finCarryIn(key);
-  const displayIncome=carryIn+totalIncome;
-  const balance=finBalanceThrough(key);
 
-  document.getElementById('finIncome').textContent=(displayIncome<0?'-€':'€')+Math.abs(Math.round(displayIncome)).toLocaleString();
-  document.getElementById('finIncomeSub').textContent=carryIn?('incl. €'+Math.round(carryIn).toLocaleString()+' carried over'):'';
+  document.getElementById('finIncome').textContent='€'+totalIncome.toLocaleString();
+  document.getElementById('finIncomeSub').textContent='';
   document.getElementById('finExpenses').textContent='€'+totalExpenses.toLocaleString();
   document.getElementById('finSavings').textContent='€'+totalSavings.toLocaleString();
   const remEl=document.getElementById('finRemaining');
-  remEl.textContent=(balance<0?'-€':'€')+Math.abs(Math.round(balance)).toLocaleString();
-  remEl.style.color=balance>=0?'var(--green)':'var(--red)';
+  remEl.textContent=(remaining<0?'-€':'€')+Math.abs(Math.round(remaining)).toLocaleString();
+  remEl.style.color=remaining>=0?'var(--green)':'var(--red)';
 
   const savBar=document.getElementById('finSavingsBar');
   if(totalIncome>0){
@@ -1188,7 +1198,7 @@ function renderFinance(){
   }else{savBar.style.display='none'}
 
   renderFinBalanceBanner(key,remaining);
-  renderFinDailyBudget(displayIncome,totalExpenses,totalSavings);
+  renderFinDailyBudget(totalIncome,totalExpenses,totalSavings);
   renderFinHealthCards(key,totalIncome,totalExpenses,totalSavings,savingsRate);
   renderFinInsights(key,data,totalIncome,totalExpenses,totalSavings);
   renderFinIncome(data,key);
@@ -1435,17 +1445,10 @@ function finDeleteRecurring(id){finSetRecurring(finGetRecurring().filter(r=>r.id
 
 function renderFinIncome(data,key){
   const list=document.getElementById('finIncomeList');
-  const carryIn=finCarryIn(key);
-  let rows='';
-  if(carryIn){
-    const prevLabel=finMonthLabel(finPrevKey(key)).split(' ')[0];
-    const carryColor=carryIn<0?'var(--red)':'var(--green)';
-    rows+=`<div class="fin-entry" style="background:var(--surface2)"><span class="fin-entry-label" style="color:var(--text2)">⬆ Carried over from ${prevLabel}</span><span class="fin-entry-amount" style="color:${carryColor}">${carryIn<0?'-':''}€${Math.abs(Math.round(carryIn)).toLocaleString()}</span><span style="width:28px;flex-shrink:0"></span></div>`;
-  }
-  rows+=data.income.map(e=>`<div class="fin-entry"><span class="fin-entry-label">${e.recurId?'🔁 ':''}${e.label}${e.date?' <span style="font-size:.68rem;color:var(--text3)">'+finOrdinal(parseInt(e.date.slice(8,10)))+'</span>':''}</span><span class="fin-entry-amount" style="color:var(--green)">€${e.amount.toLocaleString()}</span><button class="fin-delete" onclick="finDeleteIncome('${key}','${e.id}')">✕</button></div>`).join('');
+  const rows=data.income.map(e=>`<div class="fin-entry"><span class="fin-entry-label">${e.recurId?'🔁 ':''}${e.label}${e.date?' <span style="font-size:.68rem;color:var(--text3)">'+finOrdinal(parseInt(e.date.slice(8,10)))+'</span>':''}</span><span class="fin-entry-amount" style="color:var(--green)">€${e.amount.toLocaleString()}</span><button class="fin-delete" onclick="finDeleteIncome('${key}','${e.id}')">✕</button></div>`).join('');
   list.innerHTML=rows||'<div class="fin-empty">No income entries this month.</div>';
   const earned=data.income.reduce((s,e)=>s+e.amount,0);
-  document.getElementById('finIncomeTotal').textContent='€'+Math.round(carryIn+earned).toLocaleString();
+  document.getElementById('finIncomeTotal').textContent='€'+earned.toLocaleString();
 }
 
 function renderFinExpenses(data,key){
