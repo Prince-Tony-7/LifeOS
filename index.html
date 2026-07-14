@@ -1067,7 +1067,10 @@ function finSetAll(d){localStorage.setItem('pt_fin_all',JSON.stringify(d))}
 function finGetDebts(){return JSON.parse(localStorage.getItem('pt_fin_debts')||'[]')}
 function finSetDebts(d){localStorage.setItem('pt_fin_debts',JSON.stringify(d))}
 function finGetMonth(key){const all=finGetAll();return all[key]||{income:[],expenses:[]}}
-function finSaveMonth(key,data){const all=finGetAll();all[key]=data;finSetAll(all)}
+function finSaveMonth(key,data){const all=finGetAll();all[key]=data;finSetAll(all);finSyncMonth(key,data)}
+async function finSyncMonth(key,data){updateSyncStatus('saving');await sbFetch('finance_log','POST',{month:key,data,updated_at:new Date().toISOString()})}
+async function finSyncDebtUpsert(d){updateSyncStatus('saving');await sbFetch('finance_debts','POST',{id:d.id,label:d.label,balance:d.balance,min_payment:d.minPayment,apr:d.apr,updated_at:new Date().toISOString()})}
+async function finSyncDebtDelete(id){updateSyncStatus('saving');await sbFetch('finance_debts','DELETE',null,'?id=eq.'+id)}
 
 function changeFinMonth(delta){finMonthOffset+=delta;renderFinance()}
 
@@ -1356,21 +1359,34 @@ function finAddDebt(){
   if(!label||!balance||balance<=0){toast('Enter name and balance','error');return}
   const minPayment=parseFloat(document.getElementById('finDebtMin').value)||0;
   const apr=parseFloat(document.getElementById('finDebtApr').value)||0;
-  const debts=finGetDebts();debts.push({id:finId(),label,balance,minPayment,apr});
-  finSetDebts(debts);finCancelForm('debt');renderFinance();toast('Debt added','success');
+  const newDebt={id:finId(),label,balance,minPayment,apr};
+  const debts=finGetDebts();debts.push(newDebt);
+  finSetDebts(debts);finSyncDebtUpsert(newDebt);finCancelForm('debt');renderFinance();toast('Debt added','success');
 }
 function finDeleteIncome(key,id){const data=finGetMonth(key);data.income=data.income.filter(e=>e.id!==id);finSaveMonth(key,data);renderFinance()}
 function finDeleteExpense(key,id){const data=finGetMonth(key);data.expenses=data.expenses.filter(e=>e.id!==id);finSaveMonth(key,data);renderFinance()}
-function finDeleteDebt(id){finSetDebts(finGetDebts().filter(d=>d.id!==id));renderFinance()}
+function finDeleteDebt(id){finSetDebts(finGetDebts().filter(d=>d.id!==id));finSyncDebtDelete(id);renderFinance()}
 
 // ─── Boot ───────────────────────────────────────────────────
 async function boot(){
-  const[discRows,scoreRows]=await Promise.all([
+  const[discRows,scoreRows,finRows,debtRows]=await Promise.all([
     sbFetch('discipline_log','GET',null,'?select=date,entry'),
     sbFetch('score_log','GET',null,'?select=week,scores'),
+    sbFetch('finance_log','GET',null,'?select=month,data'),
+    sbFetch('finance_debts','GET',null,'?select=id,label,balance,min_payment,apr'),
   ]);
   if(discRows){disciplineCache={};discRows.forEach(r=>{disciplineCache[r.date]=r.entry});lsSet('discipline_log',disciplineCache)}
   if(scoreRows){scoreCache={};scoreRows.forEach(r=>{scoreCache[r.week]=r.scores});lsSet('score_log',scoreCache)}
+
+  if(finRows){
+    if(finRows.length){const all={};finRows.forEach(r=>{all[r.month]=r.data});finSetAll(all)}
+    else{const localFin=finGetAll();for(const[month,data]of Object.entries(localFin)){await sbFetch('finance_log','POST',{month,data,updated_at:new Date().toISOString()})}}
+  }
+  if(debtRows){
+    if(debtRows.length){finSetDebts(debtRows.map(r=>({id:r.id,label:r.label,balance:r.balance,minPayment:r.min_payment,apr:r.apr})))}
+    else{const localDebts=finGetDebts();for(const d of localDebts){await sbFetch('finance_debts','POST',{id:d.id,label:d.label,balance:d.balance,min_payment:d.minPayment,apr:d.apr,updated_at:new Date().toISOString()})}}
+  }
+
   renderDashboard();renderDisciplines();renderScoreSliders();
 }
 boot();

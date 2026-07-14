@@ -23,7 +23,7 @@ These live in the `<script>` block near the bottom of `index.html`. Find them by
 - **Deploy:** push to main → GitHub Pages auto-deploys within 2 minutes
 
 ## Supabase database tables
-Two tables exist in the project's Supabase instance:
+Four tables exist in the project's Supabase instance:
 
 ```sql
 discipline_log (
@@ -37,8 +37,23 @@ score_log (
   scores jsonb not null,       -- domain scores object
   updated_at timestamptz default now()
 )
+
+finance_log (
+  month text primary key,      -- e.g. "2026-07"
+  data jsonb not null,         -- { income: [...], expenses: [...] }
+  updated_at timestamptz default now()
+)
+
+finance_debts (
+  id text primary key,
+  label text not null,
+  balance numeric not null,
+  min_payment numeric default 0,
+  apr numeric default 0,
+  updated_at timestamptz default now()
+)
 ```
-Row Level Security is disabled on both tables (personal tool, no auth needed).
+Row Level Security is disabled on all tables (personal tool, no auth needed).
 
 ## File structure
 ```
@@ -71,6 +86,11 @@ Shows daily completion percentage and current streak.
 8 domain sliders (1–10) for Faith, Ministry, Finance, Career, GridNodes, Health, Relationships, Family.
 Saves to `score_log` in Supabase keyed by week label (e.g. "W28 2026").
 Trends tab shows line chart of scores over time with week-on-week delta.
+
+### 4. Finance tracker
+Monthly income, expenses (10 categories including savings), and debts.
+Saves to `finance_log` (keyed by month, e.g. "2026-07") and `finance_debts` (keyed by debt id) in Supabase.
+Tabs: Overview (health score, daily budget, insights, cash flow chart), Monthly (12-month summary table), Income, Expenses, Debts.
 
 ## Sync behaviour
 - On load: pulls all history from Supabase, merges with localStorage cache
