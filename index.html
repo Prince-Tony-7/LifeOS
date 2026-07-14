@@ -275,6 +275,19 @@ a{color:var(--accent);text-decoration:none}
 .fin-daily-amount{font-family:var(--font-display);font-size:2rem;font-weight:700}
 .fin-daily-label{font-size:.82rem;color:var(--text2)}
 .fin-daily-sub{font-size:.72rem;color:var(--text3);margin-top:2px}
+.fin-balance-banner{background:linear-gradient(135deg,var(--surface),var(--surface2));border:1px solid var(--border2);border-radius:var(--radius);padding:20px 22px;margin-bottom:20px;display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+.fin-balance-main{flex:1;min-width:180px}
+.fin-balance-label{font-size:.72rem;text-transform:uppercase;letter-spacing:.8px;color:var(--text3);font-weight:600;margin-bottom:4px}
+.fin-balance-value{font-family:var(--font-display);font-size:2.6rem;font-weight:700;line-height:1}
+.fin-balance-sub{font-size:.75rem;color:var(--text3);margin-top:6px}
+.fin-balance-edit{font-size:.72rem;color:var(--accent);cursor:pointer;background:none;border:none;font-family:var(--font-body);padding:0;margin-top:6px}
+.fin-balance-edit:hover{text-decoration:underline}
+.fin-balance-flow{text-align:right;min-width:140px}
+.fin-balance-flow-row{font-size:.8rem;color:var(--text2);margin-bottom:4px;display:flex;justify-content:space-between;gap:16px}
+.fin-recur-day{display:inline-flex;align-items:center;justify-content:center;min-width:38px;height:24px;padding:0 8px;border-radius:var(--radius-xs);background:var(--surface2);font-size:.72rem;font-weight:600;color:var(--text2)}
+.fin-recur-log{font-size:.7rem;color:var(--accent);cursor:pointer;background:none;border:1px solid rgba(var(--accent-rgb),.3);border-radius:var(--radius-xs);font-family:var(--font-body);padding:3px 8px;transition:var(--transition)}
+.fin-recur-log:hover{background:var(--accent-glow)}
+.fin-section-title{font-size:.95rem;font-weight:600;margin:20px 0 12px;display:flex;align-items:center;gap:8px}
 
 @media(max-width:768px){
   .sidebar{transform:translateX(-100%)}.sidebar.open{transform:translateX(0)}.hamburger{display:block}.overlay.open{display:block}
@@ -427,11 +440,21 @@ a{color:var(--accent);text-decoration:none}
   <div class="tab-bar">
     <button class="tab-btn active" onclick="showFinTab('overview',this)">Overview</button>
     <button class="tab-btn" onclick="showFinTab('monthly',this)">Monthly</button>
+    <button class="tab-btn" onclick="showFinTab('forecast',this)">Forecast</button>
     <button class="tab-btn" onclick="showFinTab('income',this)">Income</button>
     <button class="tab-btn" onclick="showFinTab('expenses',this)">Expenses</button>
     <button class="tab-btn" onclick="showFinTab('debts',this)">Debts</button>
   </div>
   <div class="fin-tab-content active" id="finTabOverview">
+    <div class="fin-balance-banner" id="finBalanceBanner">
+      <div class="fin-balance-main">
+        <div class="fin-balance-label">Account Balance</div>
+        <div class="fin-balance-value" id="finBalanceValue">€0</div>
+        <div class="fin-balance-sub" id="finBalanceSub"></div>
+        <button class="fin-balance-edit" onclick="finEditOpening()">Edit starting balance</button>
+      </div>
+      <div class="fin-balance-flow" id="finBalanceFlow"></div>
+    </div>
     <div class="fin-daily-budget" id="finDailyBudget" style="display:none">
       <div><div class="fin-daily-amount" id="finDailyAmt">€0</div><div class="fin-daily-sub" id="finDailySub"></div></div>
       <div style="flex:1"><div class="fin-daily-label">Daily budget remaining</div><div style="font-size:.72rem;color:var(--text3);margin-top:2px" id="finDailyExplain"></div></div>
@@ -449,6 +472,9 @@ a{color:var(--accent);text-decoration:none}
   </div>
   <div class="fin-tab-content" id="finTabMonthly">
     <div id="finMonthlyContent"></div>
+  </div>
+  <div class="fin-tab-content" id="finTabForecast">
+    <div id="finForecastContent"></div>
   </div>
   <div class="fin-tab-content" id="finTabIncome">
     <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden">
@@ -1058,7 +1084,7 @@ const FIN_CATS=[
   {id:'personal',label:'Personal',emoji:'🛍️',color:'#7a7890'},
   {id:'savings',label:'Savings',emoji:'💰',color:'#1aaa6a'},
 ];
-let finMonthOffset=0,finOverviewChart=null;
+let finMonthOffset=0,finOverviewChart=null,finForecastChart=null;
 function finId(){return Math.random().toString(36).slice(2,9)}
 function finMonthKey(offset){const d=new Date();d.setMonth(d.getMonth()+(offset||0));return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')}
 function finMonthLabel(key){const[y,m]=key.split('-');return new Date(y,m-1).toLocaleDateString('en-IE',{month:'long',year:'numeric'})}
@@ -1069,6 +1095,18 @@ function finSetDebts(d){localStorage.setItem('pt_fin_debts',JSON.stringify(d))}
 function finGetMonth(key){const all=finGetAll();return all[key]||{income:[],expenses:[]}}
 function finSaveMonth(key,data){const all=finGetAll();all[key]=data;finSetAll(all);finSyncMonth(key,data)}
 async function finSyncMonth(key,data){updateSyncStatus('saving');await sbFetch('finance_log','POST',{month:key,data,updated_at:new Date().toISOString()})}
+// Opening balance & recurring items stored as special rows in finance_log
+function finGetOpening(){const all=finGetAll();return(all['_opening']&&all['_opening'].amount)||0}
+function finSetOpening(amt){const all=finGetAll();all['_opening']={amount:amt};finSetAll(all);finSyncMonth('_opening',{amount:amt})}
+function finGetRecurring(){const all=finGetAll();return(all['_recurring']&&all['_recurring'].items)||[]}
+function finSetRecurring(items){const all=finGetAll();all['_recurring']={items};finSetAll(all);finSyncMonth('_recurring',{items})}
+function finIsMonthKey(k){return /^\d{4}-\d{2}$/.test(k)}
+// Running account balance: opening + cumulative remaining through the given month
+function finBalanceThrough(key){
+  const all=finGetAll();let bal=finGetOpening();
+  Object.keys(all).forEach(k=>{if(finIsMonthKey(k)&&k<=key)bal+=finCalc(k).remaining});
+  return bal;
+}
 async function finSyncDebtUpsert(d){updateSyncStatus('saving');await sbFetch('finance_debts','POST',{id:d.id,label:d.label,balance:d.balance,min_payment:d.minPayment,apr:d.apr,updated_at:new Date().toISOString()})}
 async function finSyncDebtDelete(id){updateSyncStatus('saving');await sbFetch('finance_debts','DELETE',null,'?id=eq.'+id)}
 
@@ -1077,9 +1115,10 @@ function changeFinMonth(delta){finMonthOffset+=delta;renderFinance()}
 function showFinTab(tab,btn){
   document.querySelectorAll('#page-finance .tab-btn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
-  ['Overview','Monthly','Income','Expenses','Debts'].forEach(t=>{document.getElementById('finTab'+t).classList.remove('active')});
+  ['Overview','Monthly','Forecast','Income','Expenses','Debts'].forEach(t=>{document.getElementById('finTab'+t).classList.remove('active')});
   document.getElementById('finTab'+tab.charAt(0).toUpperCase()+tab.slice(1)).classList.add('active');
   if(tab==='monthly')renderFinMonthly();
+  if(tab==='forecast')renderFinForecast();
 }
 
 function finCalc(key){
@@ -1113,6 +1152,7 @@ function renderFinance(){
     document.getElementById('finSavingsPct').style.color=savingsRate>=20?'var(--green)':'var(--yellow)';
   }else{savBar.style.display='none'}
 
+  renderFinBalanceBanner(key,remaining);
   renderFinDailyBudget(totalIncome,totalExpenses,totalSavings);
   renderFinHealthCards(key,totalIncome,totalExpenses,totalSavings,savingsRate);
   renderFinInsights(key,data,totalIncome,totalExpenses,totalSavings);
@@ -1121,6 +1161,34 @@ function renderFinance(){
   renderFinDebts();
   renderFinOverview(key);
   renderFinBreakdown(data);
+}
+
+function renderFinBalanceBanner(key,remaining){
+  const bal=finBalanceThrough(key);
+  const valEl=document.getElementById('finBalanceValue');
+  valEl.textContent=(bal<0?'-€':'€')+Math.abs(Math.round(bal)).toLocaleString();
+  valEl.style.color=bal>=0?'var(--text)':'var(--red)';
+  const isCurrent=key===finMonthKey(0);
+  const opening=finGetOpening();
+  document.getElementById('finBalanceSub').textContent=(isCurrent?'As of today · ':'End of '+finMonthLabel(key).split(' ')[0]+' · ')+'carries over month to month';
+  const flowEl=document.getElementById('finBalanceFlow');
+  const prevKey=finMonthKey(finMonthOffset-1);
+  const startBal=finBalanceThrough(prevKey);
+  const netSign=remaining>=0?'+':'-';
+  const netColor=remaining>=0?'var(--green)':'var(--red)';
+  flowEl.innerHTML=`<div class="fin-balance-flow-row"><span>Start of month</span><span>€${Math.round(startBal).toLocaleString()}</span></div>`+
+    `<div class="fin-balance-flow-row"><span>This month net</span><span style="color:${netColor}">${netSign}€${Math.abs(Math.round(remaining)).toLocaleString()}</span></div>`+
+    `<div class="fin-balance-flow-row" style="border-top:1px solid var(--border);padding-top:4px;margin-top:2px;font-weight:600;color:var(--text)"><span>Balance</span><span>€${Math.round(bal).toLocaleString()}</span></div>`+
+    (opening?`<div class="fin-balance-flow-row" style="font-size:.68rem;color:var(--text3)"><span>Opening balance</span><span>€${opening.toLocaleString()}</span></div>`:'');
+}
+
+function finEditOpening(){
+  const cur=finGetOpening();
+  const input=prompt('Set your starting account balance (€).\nThis is the money in your account before tracking began — everything carries over from here.',cur||'');
+  if(input===null)return;
+  const amt=parseFloat(input);
+  if(isNaN(amt)){toast('Enter a valid number','error');return}
+  finSetOpening(amt);renderFinance();toast('Starting balance updated','success');
 }
 
 function renderFinDailyBudget(income,expenses,savings){
@@ -1205,7 +1273,7 @@ function renderFinMonthly(){
 
   let html='<div style="font-size:.95rem;font-weight:600;margin-bottom:16px">12-Month Financial Summary</div>';
   html+='<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:.78rem;min-width:600px">';
-  html+='<thead><tr style="border-bottom:2px solid var(--border)"><th style="text-align:left;padding:10px 8px;color:var(--text3);font-weight:600">Month</th><th style="text-align:right;padding:10px 8px;color:var(--green)">Income</th><th style="text-align:right;padding:10px 8px;color:var(--red)">Expenses</th><th style="text-align:right;padding:10px 8px;color:#8b82f0">Savings</th><th style="text-align:right;padding:10px 8px;color:var(--text2)">Net</th><th style="text-align:right;padding:10px 8px;color:var(--text2)">Sav %</th></tr></thead><tbody>';
+  html+='<thead><tr style="border-bottom:2px solid var(--border)"><th style="text-align:left;padding:10px 8px;color:var(--text3);font-weight:600">Month</th><th style="text-align:right;padding:10px 8px;color:var(--green)">Income</th><th style="text-align:right;padding:10px 8px;color:var(--red)">Expenses</th><th style="text-align:right;padding:10px 8px;color:#8b82f0">Savings</th><th style="text-align:right;padding:10px 8px;color:var(--text2)">Net</th><th style="text-align:right;padding:10px 8px;color:var(--text2)">Sav %</th><th style="text-align:right;padding:10px 8px;color:var(--text2)">Balance</th></tr></thead><tbody>';
 
   let totalInc=0,totalExp=0,totalSav=0,activeMonths=0;
   months.forEach(k=>{
@@ -1216,11 +1284,12 @@ function renderFinMonthly(){
     const netColor=net>=0?'var(--green)':'var(--red)';
     const savColor=c.savingsRate>=20?'var(--green)':c.savingsRate>=10?'var(--yellow)':'var(--text3)';
     const hasData=c.totalIncome||c.totalExpenses;
-    html+=`<tr style="border-bottom:1px solid var(--border);opacity:${hasData?1:.35}"><td style="padding:8px;font-weight:500">${finMonthLabel(k).split(' ')[0]} ${k.split('-')[0].slice(2)}</td><td style="padding:8px;text-align:right;color:var(--green)">€${c.totalIncome.toLocaleString()}</td><td style="padding:8px;text-align:right;color:var(--red)">€${c.totalExpenses.toLocaleString()}</td><td style="padding:8px;text-align:right;color:#8b82f0">€${c.totalSavings.toLocaleString()}</td><td style="padding:8px;text-align:right;color:${netColor}">${net<0?'-':''}€${Math.abs(net).toLocaleString()}</td><td style="padding:8px;text-align:right;color:${savColor}">${hasData?c.savingsRate+'%':'—'}</td></tr>`;
+    const runBal=finBalanceThrough(k);
+    html+=`<tr style="border-bottom:1px solid var(--border);opacity:${hasData?1:.35}"><td style="padding:8px;font-weight:500">${finMonthLabel(k).split(' ')[0]} ${k.split('-')[0].slice(2)}</td><td style="padding:8px;text-align:right;color:var(--green)">€${c.totalIncome.toLocaleString()}</td><td style="padding:8px;text-align:right;color:var(--red)">€${c.totalExpenses.toLocaleString()}</td><td style="padding:8px;text-align:right;color:#8b82f0">€${c.totalSavings.toLocaleString()}</td><td style="padding:8px;text-align:right;color:${netColor}">${net<0?'-':''}€${Math.abs(net).toLocaleString()}</td><td style="padding:8px;text-align:right;color:${savColor}">${hasData?c.savingsRate+'%':'—'}</td><td style="padding:8px;text-align:right;font-weight:600;color:${runBal>=0?'var(--text2)':'var(--red)'}">€${Math.round(runBal).toLocaleString()}</td></tr>`;
   });
 
   const totalNet=totalInc-totalExp-totalSav;
-  html+=`<tr style="border-top:2px solid var(--border);font-weight:700"><td style="padding:10px 8px">Total</td><td style="padding:10px 8px;text-align:right;color:var(--green)">€${totalInc.toLocaleString()}</td><td style="padding:10px 8px;text-align:right;color:var(--red)">€${totalExp.toLocaleString()}</td><td style="padding:10px 8px;text-align:right;color:#8b82f0">€${totalSav.toLocaleString()}</td><td style="padding:10px 8px;text-align:right;color:${totalNet>=0?'var(--green)':'var(--red)'}">${totalNet<0?'-':''}€${Math.abs(totalNet).toLocaleString()}</td><td style="padding:10px 8px;text-align:right;color:${totalInc>0&&Math.round((totalSav/totalInc)*100)>=20?'var(--green)':'var(--yellow)'}">${totalInc>0?Math.round((totalSav/totalInc)*100)+'%':'—'}</td></tr>`;
+  html+=`<tr style="border-top:2px solid var(--border);font-weight:700"><td style="padding:10px 8px">Total</td><td style="padding:10px 8px;text-align:right;color:var(--green)">€${totalInc.toLocaleString()}</td><td style="padding:10px 8px;text-align:right;color:var(--red)">€${totalExp.toLocaleString()}</td><td style="padding:10px 8px;text-align:right;color:#8b82f0">€${totalSav.toLocaleString()}</td><td style="padding:10px 8px;text-align:right;color:${totalNet>=0?'var(--green)':'var(--red)'}">${totalNet<0?'-':''}€${Math.abs(totalNet).toLocaleString()}</td><td style="padding:10px 8px;text-align:right;color:${totalInc>0&&Math.round((totalSav/totalInc)*100)>=20?'var(--green)':'var(--yellow)'}">${totalInc>0?Math.round((totalSav/totalInc)*100)+'%':'—'}</td><td style="padding:10px 8px"></td></tr>`;
   html+='</tbody></table></div>';
 
   html+='<div class="hero-stats" style="grid-template-columns:repeat(4,1fr);margin-top:20px">';
@@ -1232,6 +1301,105 @@ function renderFinMonthly(){
 
   if(!activeMonths)html='<div class="fin-empty">Start adding income and expenses to see your monthly overview.</div>';
   el.innerHTML=html;
+}
+
+// ─── Forecast & recurring ───────────────────────────────────
+function finRecurRow(r,monLabel){
+  const catInfo=r.type==='expense'?(FIN_CATS.find(c=>c.id===r.category)||{emoji:'',color:'var(--text2)'}):null;
+  const amtColor=r.type==='income'?'var(--green)':'var(--red)';
+  const sign=r.type==='income'?'+':'-';
+  return `<div class="fin-entry"><span class="fin-recur-day" title="Day of month">${r.day}${r.day===1?'st':r.day===2?'nd':r.day===3?'rd':'th'}</span><span class="fin-entry-label">${catInfo?catInfo.emoji+' ':''}${r.label}</span><span class="fin-entry-amount" style="color:${amtColor}">${sign}€${r.amount.toLocaleString()}</span><button class="fin-recur-log" onclick="finLogRecurring('${r.id}')">Log to ${monLabel}</button><button class="fin-delete" onclick="finDeleteRecurring('${r.id}')">✕</button></div>`;
+}
+
+function renderFinForecast(){
+  const el=document.getElementById('finForecastContent');
+  const rec=finGetRecurring();
+  const recIncome=rec.filter(r=>r.type==='income').sort((a,b)=>a.day-b.day);
+  const recExpense=rec.filter(r=>r.type==='expense').sort((a,b)=>a.day-b.day);
+  const monInc=recIncome.reduce((s,r)=>s+r.amount,0);
+  const monExp=recExpense.reduce((s,r)=>s+r.amount,0);
+  const monNet=monInc-monExp;
+  const monLabel=finMonthLabel(finMonthKey(finMonthOffset)).split(' ')[0].slice(0,3);
+  const catOpts=FIN_CATS.map(c=>`<option value="${c.id}">${c.emoji} ${c.label}</option>`).join('');
+
+  let html='';
+  html+='<div class="hero-stats" style="grid-template-columns:repeat(3,1fr);margin-bottom:8px">';
+  html+=`<div class="hero-stat"><div class="hero-stat-label">Recurring Income</div><div class="hero-stat-value" style="font-size:1.5rem;color:var(--green)">€${monInc.toLocaleString()}</div><div class="hero-stat-sub">per month</div></div>`;
+  html+=`<div class="hero-stat"><div class="hero-stat-label">Recurring Expenses</div><div class="hero-stat-value" style="font-size:1.5rem;color:var(--red)">€${monExp.toLocaleString()}</div><div class="hero-stat-sub">per month</div></div>`;
+  html+=`<div class="hero-stat"><div class="hero-stat-label">Monthly Net</div><div class="hero-stat-value" style="font-size:1.5rem;color:${monNet>=0?'var(--green)':'var(--red)'}">${monNet<0?'-':'+'}€${Math.abs(monNet).toLocaleString()}</div><div class="hero-stat-sub">recurring cash flow</div></div>`;
+  html+='</div>';
+
+  // Recurring income
+  html+='<div class="fin-section-title">🔁 Recurring Income</div>';
+  html+='<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden">';
+  html+=recIncome.length?recIncome.map(r=>finRecurRow(r,monLabel)).join(''):'<div class="fin-empty" style="padding:20px">No recurring income yet. Add your salary and any regular payments below.</div>';
+  html+='</div>';
+  html+=`<div class="fin-add-form"><input type="text" id="finRecIncLabel" placeholder="Source (e.g. Meditec Salary)" style="flex:1;min-width:160px"><input type="number" id="finRecIncAmt" placeholder="€ Amount" style="width:110px" min="0"><input type="number" id="finRecIncDay" placeholder="Day" style="width:80px" min="1" max="31" title="Day of month"><button class="fin-form-btn primary" onclick="finAddRecurring('income')">Add</button></div>`;
+
+  // Recurring expenses
+  html+='<div class="fin-section-title">🔁 Recurring Expenses</div>';
+  html+='<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden">';
+  html+=recExpense.length?recExpense.map(r=>finRecurRow(r,monLabel)).join(''):'<div class="fin-empty" style="padding:20px">No recurring expenses yet. Add rent, subscriptions, and other fixed bills below.</div>';
+  html+='</div>';
+  html+=`<div class="fin-add-form"><select id="finRecExpCat" style="min-width:150px">${catOpts}</select><input type="text" id="finRecExpLabel" placeholder="Description (e.g. Rent)" style="flex:1;min-width:140px"><input type="number" id="finRecExpAmt" placeholder="€ Amount" style="width:110px" min="0"><input type="number" id="finRecExpDay" placeholder="Day" style="width:80px" min="1" max="31" title="Day of month"><button class="fin-form-btn primary" onclick="finAddRecurring('expense')">Add</button></div>`;
+
+  // Projection
+  html+='<div class="fin-section-title">📈 12-Month Balance Projection</div>';
+  const startKey=finMonthKey(0),startBal=finBalanceThrough(startKey);
+  if(monNet<0&&startBal>0){
+    const runOut=Math.floor(startBal/-monNet);
+    html+=`<div class="fin-insight-card" style="border-color:rgba(248,113,113,.3)"><div style="font-size:.85rem;color:var(--red)">⚠️ At this recurring rate, your balance drops €${Math.abs(monNet).toLocaleString()}/month. Current funds last about <strong>${runOut} month${runOut!==1?'s':''}</strong>.</div></div>`;
+  }else if(monNet>0){
+    html+=`<div class="fin-insight-card" style="border-color:rgba(74,222,128,.3)"><div style="font-size:.85rem;color:var(--green)">✅ On track — your balance grows €${monNet.toLocaleString()}/month at the current recurring rate.</div></div>`;
+  }
+  html+='<div class="chart-container"><canvas id="finForecastChart"></canvas></div>';
+
+  // Projection table
+  html+='<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:.78rem;min-width:480px">';
+  html+='<thead><tr style="border-bottom:2px solid var(--border)"><th style="text-align:left;padding:10px 8px;color:var(--text3);font-weight:600">Month</th><th style="text-align:right;padding:10px 8px;color:var(--green)">+Income</th><th style="text-align:right;padding:10px 8px;color:var(--red)">-Expenses</th><th style="text-align:right;padding:10px 8px;color:var(--text2)">Net</th><th style="text-align:right;padding:10px 8px;color:var(--text2)">Projected Balance</th></tr></thead><tbody>';
+  let running=startBal;
+  for(let i=1;i<=12;i++){
+    running+=monNet;
+    const parts=finMonthLabel(finMonthKey(i)).split(' ');
+    const lbl=parts[0].slice(0,3)+" '"+parts[1].slice(2);
+    const balColor=running>=0?'var(--text2)':'var(--red)';
+    html+=`<tr style="border-bottom:1px solid var(--border)"><td style="padding:8px;font-weight:500">${lbl}</td><td style="padding:8px;text-align:right;color:var(--green)">€${monInc.toLocaleString()}</td><td style="padding:8px;text-align:right;color:var(--red)">€${monExp.toLocaleString()}</td><td style="padding:8px;text-align:right;color:${monNet>=0?'var(--green)':'var(--red)'}">${monNet<0?'-':'+'}€${Math.abs(monNet).toLocaleString()}</td><td style="padding:8px;text-align:right;font-weight:600;color:${balColor}">€${Math.round(running).toLocaleString()}</td></tr>`;
+  }
+  html+='</tbody></table></div>';
+
+  el.innerHTML=html;
+  renderFinForecastChart(startBal,monNet);
+}
+
+function renderFinForecastChart(startBal,monNet){
+  const canvas=document.getElementById('finForecastChart');if(!canvas||!chartsReady)return;
+  const labels=['Now'],data=[Math.round(startBal)];
+  let running=startBal;
+  for(let i=1;i<=12;i++){running+=monNet;labels.push(finMonthLabel(finMonthKey(i)).split(' ')[0].slice(0,3));data.push(Math.round(running))}
+  const lineColor=monNet>=0?'#4ade80':'#f87171';
+  if(finForecastChart)finForecastChart.destroy();
+  finForecastChart=new Chart(canvas,{type:'line',data:{labels,datasets:[{label:'Projected balance',data,borderColor:lineColor,backgroundColor:lineColor+'15',fill:true,tension:.3,pointRadius:3,pointBackgroundColor:data.map(v=>v<0?'#f87171':lineColor),borderWidth:2}]},options:{responsive:true,plugins:{legend:{display:false},tooltip:{backgroundColor:'#181824',borderColor:'#1f1f30',borderWidth:1,padding:10,cornerRadius:8,callbacks:{label:c=>'€'+c.raw.toLocaleString()}}},scales:{x:{ticks:{color:'#6a6a80',font:{size:10}},grid:{display:false}},y:{ticks:{color:'#6a6a80',callback:v=>'€'+v.toLocaleString()},grid:{color:'rgba(31,31,48,.5)'}}}}});
+}
+
+function finAddRecurring(type){
+  const isInc=type==='income';
+  const label=document.getElementById(isInc?'finRecIncLabel':'finRecExpLabel').value.trim();
+  const amount=parseFloat(document.getElementById(isInc?'finRecIncAmt':'finRecExpAmt').value);
+  const dayRaw=parseInt(document.getElementById(isInc?'finRecIncDay':'finRecExpDay').value);
+  if(!label||!amount||amount<=0){toast('Enter description, amount and day','error');return}
+  const day=(dayRaw>=1&&dayRaw<=31)?dayRaw:1;
+  const item={id:finId(),type,label,amount,day};
+  if(!isInc)item.category=document.getElementById('finRecExpCat').value;
+  const list=finGetRecurring();list.push(item);finSetRecurring(list);
+  renderFinForecast();toast('Recurring '+type+' added','success');
+}
+function finDeleteRecurring(id){finSetRecurring(finGetRecurring().filter(r=>r.id!==id));renderFinForecast()}
+function finLogRecurring(id){
+  const item=finGetRecurring().find(r=>r.id===id);if(!item)return;
+  const key=finMonthKey(finMonthOffset),data=finGetMonth(key);
+  if(item.type==='income')data.income.push({id:finId(),label:item.label,amount:item.amount});
+  else data.expenses.push({id:finId(),label:item.label,amount:item.amount,category:item.category});
+  finSaveMonth(key,data);renderFinForecast();toast('Logged to '+finMonthLabel(key).split(' ')[0],'success');
 }
 
 function renderFinIncome(data,key){
