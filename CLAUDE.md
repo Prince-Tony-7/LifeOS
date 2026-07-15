@@ -52,6 +52,12 @@ finance_debts (
   apr numeric default 0,
   updated_at timestamptz default now()
 )
+
+health_log (
+  id text primary key,         -- one row per logged run
+  run jsonb not null,          -- full run object (distance, splits, etc.)
+  updated_at timestamptz default now()
+)
 ```
 Row Level Security is disabled on all tables (personal tool, no auth needed).
 
@@ -91,6 +97,11 @@ Trends tab shows line chart of scores over time with week-on-week delta.
 Monthly income, expenses (10 categories including savings), and debts.
 Saves to `finance_log` (keyed by month, e.g. "2026-07") and `finance_debts` (keyed by debt id) in Supabase.
 Tabs: Overview (health score, daily budget, insights, cash flow chart), Monthly (12-month summary table), Income, Expenses, Debts.
+
+### 5. Health (10K tracker)
+Run logging toward a 10K in under 1 hour. Coral accent (#e06050).
+Saves one row per run to `health_log` in Supabase (localStorage cache `pt_health_runs`).
+Tabs: Overview (distance + sub-60 goals, projected 10K, Month/Year/All-time summary, distance + pace charts), Log run (time-picker inputs, auto-derived pace, up to 10 splits), History, Records.
 
 ## Sync behaviour
 - On load: pulls all history from Supabase, merges with localStorage cache
