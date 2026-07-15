@@ -774,6 +774,7 @@ function showDisciplineTab(tab,btn){
 }
 
 function renderDisciplines(){
+  disciplineDirty=false;
   const key=dateStr(currentDate);
   document.getElementById('dateLabel').textContent=formatDate(currentDate);
   const entry=disciplineCache[key]||{};
@@ -844,6 +845,7 @@ function updateDisciplineStats(){const entry=gatherEntry();renderCatProgress(ent
 async function saveDisciplines(){
   const key=dateStr(currentDate),entry=gatherEntry();
   disciplineCache[key]=entry;lsSet('discipline_log',disciplineCache);
+  disciplineDirty=false;
   updateDisciplineStats();
   const{current}=calcStreaks();document.getElementById('streakCount').textContent=current;renderStreakMilestones(current);
   document.getElementById('lastSaved').textContent='Saved at '+new Date().toLocaleTimeString('en-IE',{hour:'2-digit',minute:'2-digit'});
@@ -852,8 +854,10 @@ async function saveDisciplines(){
   toast(result?'Saved & synced':'Saved locally',result?'success':'error');
 }
 
-document.getElementById('habitsContainer').addEventListener('change',updateDisciplineStats);
+let disciplineDirty=false;
+document.getElementById('habitsContainer').addEventListener('change',()=>{disciplineDirty=true;updateDisciplineStats()});
 document.getElementById('habitsContainer').addEventListener('input',e=>{
+  disciplineDirty=true;
   if(e.target.classList.contains('habit-input')){
     e.target.classList.toggle('filled',e.target.value.trim().length>0);
     updateDisciplineStats();
@@ -1626,8 +1630,8 @@ function finDeleteIncome(key,id){const data=finGetMonth(key);data.income=data.in
 function finDeleteExpense(key,id){const data=finGetMonth(key);const e=data.expenses.find(x=>x.id===id);if(e&&e.debtId)finRestoreDebtPayment(e.debtId,e.amount);data.expenses=data.expenses.filter(x=>x.id!==id);finSaveMonth(key,data);renderFinance()}
 function finDeleteDebt(id){finSetDebts(finGetDebts().filter(d=>d.id!==id));finSyncDebtDelete(id);renderFinance()}
 
-// ─── Boot ───────────────────────────────────────────────────
-async function boot(){
+// ─── Sync: pull latest from Supabase, keep every device in step ─────
+async function pullAll(migrate){
   const[discRows,scoreRows,finRows,debtRows]=await Promise.all([
     sbFetch('discipline_log','GET',null,'?select=date,entry'),
     sbFetch('score_log','GET',null,'?select=week,scores'),
@@ -1636,18 +1640,44 @@ async function boot(){
   ]);
   if(discRows){disciplineCache={};discRows.forEach(r=>{disciplineCache[r.date]=r.entry});lsSet('discipline_log',disciplineCache)}
   if(scoreRows){scoreCache={};scoreRows.forEach(r=>{scoreCache[r.week]=r.scores});lsSet('score_log',scoreCache)}
-
   if(finRows){
     if(finRows.length){const all={};finRows.forEach(r=>{all[r.month]=r.data});finSetAll(all)}
-    else{const localFin=finGetAll();for(const[month,data]of Object.entries(localFin)){await sbFetch('finance_log','POST',{month,data,updated_at:new Date().toISOString()})}}
+    else if(migrate){const localFin=finGetAll();for(const[month,data]of Object.entries(localFin)){await sbFetch('finance_log','POST',{month,data,updated_at:new Date().toISOString()})}}
   }
   if(debtRows){
     if(debtRows.length){finSetDebts(debtRows.map(r=>({id:r.id,label:r.label,balance:r.balance,minPayment:r.min_payment,apr:r.apr})))}
-    else{const localDebts=finGetDebts();for(const d of localDebts){await sbFetch('finance_debts','POST',{id:d.id,label:d.label,balance:d.balance,min_payment:d.minPayment,apr:d.apr,updated_at:new Date().toISOString()})}}
+    else if(migrate){const localDebts=finGetDebts();for(const d of localDebts){await sbFetch('finance_debts','POST',{id:d.id,label:d.label,balance:d.balance,min_payment:d.minPayment,apr:d.apr,updated_at:new Date().toISOString()})}}
   }
   finMaterializeThroughCurrent();
+  return discRows!==null;
+}
 
+// Re-pull and refresh the view the user is currently looking at. Skips a
+// re-render of the disciplines form if it has unsaved edits, so a background
+// sync never wipes something you're mid-way through typing.
+let syncing=false,lastSync=0;
+async function resync(force){
+  if(syncing)return;
+  if(!force&&Date.now()-lastSync<5000)return;
+  syncing=true;lastSync=Date.now();
+  const ok=await pullAll(false);
+  syncing=false;
+  if(!ok)return;
+  const active=document.querySelector('.page.active');if(!active)return;
+  if(active.id==='page-dashboard')renderDashboard();
+  else if(active.id==='page-disciplines'){if(!disciplineDirty)renderDisciplines()}
+  else if(active.id==='page-scores'){renderScoreSliders();renderAllCharts()}
+  else if(active.id==='page-finance')renderFinance();
+  else if(active.id==='page-insights')renderInsights();
+}
+
+// ─── Boot ───────────────────────────────────────────────────
+async function boot(){
+  await pullAll(true);
   renderDashboard();renderDisciplines();renderScoreSliders();
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden)resync()});
+  window.addEventListener('focus',()=>resync());
+  setInterval(()=>{if(!document.hidden)resync()},45000);
 }
 boot();
 </script>
