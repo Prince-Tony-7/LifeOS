@@ -357,9 +357,10 @@ a{color:var(--accent);text-decoration:none}
     <div class="hero-stat"><div class="hero-stat-label">Total Adoration</div><div class="hero-stat-value" id="dashAdorationTotal" style="font-size:1.6rem">-</div><div class="hero-stat-sub">all-time hours</div></div>
     <div class="hero-stat"><div class="hero-stat-label">Longest Sitting</div><div class="hero-stat-value" id="dashAdorationBest" style="font-size:1.6rem">-</div><div class="hero-stat-sub">personal best</div></div>
   </div>
-  <div class="hero-stats" style="grid-template-columns:repeat(2,1fr);margin-bottom:24px">
-    <div class="hero-stat"><div class="hero-stat-label">Avg Wake Time</div><div class="hero-stat-value" id="dashWakeAvg" style="font-size:1.8rem">-</div><div class="hero-stat-sub">across all entries</div></div>
-    <div class="hero-stat"><div class="hero-stat-label">Avg Sleep Time</div><div class="hero-stat-value" id="dashSleepAvg" style="font-size:1.8rem">-</div><div class="hero-stat-sub">across all entries</div></div>
+  <div class="hero-stats" style="grid-template-columns:repeat(3,1fr);margin-bottom:24px">
+    <div class="hero-stat"><div class="hero-stat-label">Avg Sleep Time</div><div class="hero-stat-value" id="dashSleepAvg" style="font-size:1.8rem">-</div><div class="hero-stat-sub">when you go to bed</div></div>
+    <div class="hero-stat"><div class="hero-stat-label">Avg Sleep Duration</div><div class="hero-stat-value" id="dashSleepDur" style="font-size:1.8rem">-</div><div class="hero-stat-sub">hours slept</div></div>
+    <div class="hero-stat"><div class="hero-stat-label">Avg Wake Time</div><div class="hero-stat-value" id="dashWakeAvg" style="font-size:1.8rem">-</div><div class="hero-stat-sub">when you wake up</div></div>
   </div>
   <div class="heatmap-wrap">
     <div class="heatmap-title"><span>Discipline Heatmap</span><span style="font-size:.7rem;color:var(--text3);font-weight:400;margin-left:auto">Last 16 weeks</span></div>
@@ -676,6 +677,19 @@ function avgTimeOfDay(field,wrapPastMidnight){
   avg=((avg%1440)+1440)%1440;
   return String(Math.floor(avg/60)).padStart(2,'0')+':'+String(avg%60).padStart(2,'0');
 }
+function avgSleepDuration(){
+  const durs=[];
+  Object.values(disciplineCache).forEach(e=>{
+    const s=e.sleep_time,w=e.wake_time;
+    if(s&&w&&/^\d{1,2}:\d{2}$/.test(s)&&/^\d{1,2}:\d{2}$/.test(w)){
+      const[sh,sm]=s.split(':').map(Number),[wh,wm]=w.split(':').map(Number);
+      let dur=((wh*60+wm)-(sh*60+sm)+1440)%1440;
+      if(dur>0)durs.push(dur);
+    }
+  });
+  if(!durs.length)return null;
+  return Math.round(durs.reduce((a,b)=>a+b,0)/durs.length);
+}
 
 // ─── Dashboard ──────────────────────────────────────────────
 function renderDashboard(){
@@ -711,6 +725,10 @@ function renderDashboard(){
   bestEl.style.color=bestMin>=60?'var(--green)':bestMin>=30?'var(--yellow)':'var(--red)';
   document.getElementById('dashWakeAvg').textContent=avgTimeOfDay('wake_time',false)||'-';
   document.getElementById('dashSleepAvg').textContent=avgTimeOfDay('sleep_time',true)||'-';
+  const sleepDur=avgSleepDuration();
+  const durEl=document.getElementById('dashSleepDur');
+  durEl.textContent=sleepDur?(Math.floor(sleepDur/60)+'h '+(sleepDur%60)+'m'):'-';
+  durEl.style.color=sleepDur?(sleepDur>=420?'var(--green)':sleepDur>=360?'var(--yellow)':'var(--red)'):'var(--accent)';
   renderHeatmap();renderLast7Days();renderDashboardCards();
 }
 
