@@ -19,6 +19,7 @@
   --red:#f87171;--red-dim:rgba(248,113,113,.08);
   --yellow:#facc15;--yellow-dim:rgba(250,204,21,.08);
   --blue:#38bdf8;--orange:#fb923c;--pink:#f472b6;--teal:#2dd4bf;
+  --coral:#e06050;--coral-glow:rgba(224,96,80,.15);--purple:#8b82f0;
   --font-body:'Inter',sans-serif;--font-display:'Crimson Pro',serif;
   --radius:14px;--radius-sm:10px;--radius-xs:6px;
   --transition:all .2s cubic-bezier(.4,0,.2,1);
@@ -292,12 +293,51 @@ a{color:var(--accent);text-decoration:none}
 .fin-recur-log:hover{background:var(--accent-glow)}
 .fin-section-title{font-size:.95rem;font-weight:600;margin:20px 0 12px;display:flex;align-items:center;gap:8px}
 
+/* Health */
+#page-health .tab-btn.active{background:var(--coral)}
+#page-health .save-btn{background:var(--coral)}
+#page-health .save-btn:hover{background:#c9503f;box-shadow:0 4px 20px var(--coral-glow)}
+.health-goal{background:linear-gradient(135deg,var(--surface),var(--surface2));border:1px solid var(--border2);border-radius:var(--radius);padding:22px;margin-bottom:20px}
+.health-goal-head{font-size:.9rem;font-weight:600;color:var(--text2);margin-bottom:8px}
+.health-goal-num{font-family:var(--font-display);font-size:3rem;font-weight:700;line-height:1;color:var(--coral)}
+.health-goal-num.done{color:var(--purple)}
+.health-goal-sub{font-size:.82rem;color:var(--text3);margin-top:6px}
+.health-prog-track{height:14px;background:var(--surface2);border-radius:8px;overflow:hidden;margin:14px 0 8px}
+.health-prog-fill{height:100%;border-radius:8px;background:var(--teal);transition:width .6s cubic-bezier(.4,0,.2,1)}
+.health-prog-fill.done{background:var(--purple)}
+.run-form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+.run-field{display:flex;flex-direction:column;gap:5px}
+.run-field label{font-size:.72rem;text-transform:uppercase;letter-spacing:.6px;color:var(--text3);font-weight:600}
+.run-input{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-xs);color:var(--text);padding:9px 12px;font-size:.9rem;font-family:var(--font-body);width:100%}
+.run-input:focus{outline:none;border-color:var(--coral);box-shadow:0 0 0 3px var(--coral-glow)}
+textarea.run-input{resize:vertical}
+.split-row{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+.split-km{min-width:52px;height:38px;display:flex;align-items:center;justify-content:center;background:var(--surface2);border-radius:var(--radius-xs);font-weight:600;font-size:.75rem;color:var(--coral);flex-shrink:0}
+.split-row .run-input{flex:1;min-width:0}
+.split-row .fin-delete{flex-shrink:0}
+.run-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px;margin-bottom:12px}
+.run-card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:10px}
+.run-card-date{font-size:.85rem;color:var(--text2);font-weight:500}
+.run-card-dist{font-family:var(--font-display);font-size:2rem;font-weight:700;color:var(--coral);line-height:1;white-space:nowrap}
+.run-card-stats{font-size:.8rem;color:var(--text2);display:flex;flex-wrap:wrap;gap:4px 12px;margin-bottom:6px}
+.run-splits-toggle{font-size:.78rem;color:var(--coral);cursor:pointer;background:none;border:none;font-family:var(--font-body);padding:6px 0}
+.run-splits-table{width:100%;border-collapse:collapse;font-size:.78rem;margin-top:6px}
+.run-splits-table th{text-align:left;padding:6px 8px;color:var(--text3);font-weight:600;border-bottom:1px solid var(--border)}
+.run-splits-table td{padding:6px 8px;border-bottom:1px solid var(--border)}
+.split-fastest{color:var(--teal);font-weight:600}
+.split-slowest{color:var(--coral);font-weight:600}
+.run-notes{font-size:.82rem;color:var(--text2);margin-top:10px;padding-top:10px;border-top:1px solid var(--border);line-height:1.5}
+.run-delete{font-size:.72rem;color:var(--text3);cursor:pointer;background:none;border:1px solid var(--border);border-radius:var(--radius-xs);padding:5px 12px;font-family:var(--font-body)}
+.run-delete:hover{color:var(--red);border-color:var(--red)}
+.health-err{color:var(--red);font-size:.82rem;margin-top:10px;display:none}
+
 @media(max-width:768px){
   .sidebar{transform:translateX(-100%)}.sidebar.open{transform:translateX(0)}.hamburger{display:block}.overlay.open{display:block}
   .main{margin-left:0;padding:14px;padding-top:54px}
   .hero-stats{grid-template-columns:repeat(2,1fr)}
   .fin-summary{grid-template-columns:repeat(2,1fr)}
   .fin-health{grid-template-columns:1fr 1fr 1fr}
+  .run-form-grid{grid-template-columns:1fr}
   .cards-grid,.score-grid,.info-grid{grid-template-columns:1fr}
   .cat-progress-grid{grid-template-columns:repeat(2,1fr)}
   .streak-milestones{display:none}
@@ -326,6 +366,8 @@ a{color:var(--accent);text-decoration:none}
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>Weekly Scores</button>
   <button class="nav-link" onclick="showPage('finance',this)">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>Finance Tracker</button>
+  <button class="nav-link" onclick="showPage('health',this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>Health</button>
   <button class="nav-link" onclick="showPage('insights',this)">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>Insights</button>
   <div class="sidebar-footer">
@@ -506,6 +548,40 @@ a{color:var(--accent);text-decoration:none}
   </div>
 </div>
 
+<!-- ══════════ HEALTH ══════════ -->
+<div class="page" id="page-health">
+  <div class="page-header"><div><h1 class="page-title">Health</h1><p class="page-subtitle">Training toward 10K in one stretch.</p></div></div>
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="showHealthTab('overview',this)">Overview</button>
+    <button class="tab-btn" onclick="showHealthTab('logrun',this)">Log run</button>
+    <button class="tab-btn" onclick="showHealthTab('history',this)">History</button>
+    <button class="tab-btn" onclick="showHealthTab('records',this)">Records</button>
+  </div>
+  <div class="fin-tab-content active" id="healthTabOverview"></div>
+  <div class="fin-tab-content" id="healthTabLogrun">
+    <div class="run-field" style="max-width:220px;margin-bottom:16px"><label>Date</label><input type="date" class="run-input" id="runDate"></div>
+    <div class="run-form-grid">
+      <div class="run-field"><label>Distance (km) *</label><input type="number" step="0.1" class="run-input" id="runDist" placeholder="5.2"></div>
+      <div class="run-field"><label>Total time (HH:MM:SS) *</label><input type="text" class="run-input" id="runTime" placeholder="00:28:45"></div>
+      <div class="run-field"><label>Avg pace (min/km)</label><input type="text" class="run-input" id="runPace" placeholder="5:32"></div>
+      <div class="run-field"><label>Avg heart rate (bpm)</label><input type="number" class="run-input" id="runHR" placeholder="158"></div>
+      <div class="run-field"><label>Avg cadence (spm)</label><input type="number" class="run-input" id="runCad" placeholder="172"></div>
+      <div class="run-field"><label>Avg power (watts)</label><input type="number" class="run-input" id="runPow" placeholder="245"></div>
+      <div class="run-field"><label>Active kcal</label><input type="number" class="run-input" id="runActCal" placeholder="320"></div>
+      <div class="run-field"><label>Total kcal</label><input type="number" class="run-input" id="runTotCal" placeholder="380"></div>
+      <div class="run-field"><label>Elevation gain (m)</label><input type="number" class="run-input" id="runElev" placeholder="45"></div>
+    </div>
+    <div class="fin-section-title">Splits</div>
+    <div id="runSplits"></div>
+    <button class="fin-form-btn cancel" onclick="healthAddSplit()" id="runAddSplitBtn" style="margin-bottom:16px">+ Add split</button>
+    <div class="run-field" style="margin-bottom:8px"><label>Notes (optional)</label><textarea class="run-input" id="runNotes" rows="3" placeholder="How did it feel, conditions, anything worth recording"></textarea></div>
+    <div class="health-err" id="runErr">Distance and total time are required.</div>
+    <button class="save-btn" onclick="healthSaveRun()" style="margin-top:12px">Save Run</button>
+  </div>
+  <div class="fin-tab-content" id="healthTabHistory"></div>
+  <div class="fin-tab-content" id="healthTabRecords"></div>
+</div>
+
 <!-- ══════════ INSIGHTS ══════════ -->
 <div class="page" id="page-insights">
   <div class="page-header"><div><h1 class="page-title">Insights</h1><p class="page-subtitle">Patterns and progress over time</p></div></div>
@@ -552,6 +628,7 @@ function showPage(id,btn){
   if(id==='disciplines')renderDisciplines();
   if(id==='scores'){renderScoreSliders();renderAllCharts()}
   if(id==='finance')renderFinance();
+  if(id==='health')renderHealth();
   if(id==='insights')renderInsights();
   if(window.innerWidth<=768)toggleSidebar();
 }
@@ -1647,6 +1724,228 @@ function finAddDebt(){
 function finDeleteIncome(key,id){const data=finGetMonth(key);data.income=data.income.filter(e=>e.id!==id);finSaveMonth(key,data);renderFinance()}
 function finDeleteExpense(key,id){const data=finGetMonth(key);const e=data.expenses.find(x=>x.id===id);if(e&&e.debtId)finRestoreDebtPayment(e.debtId,e.amount);data.expenses=data.expenses.filter(x=>x.id!==id);finSaveMonth(key,data);renderFinance()}
 function finDeleteDebt(id){finSetDebts(finGetDebts().filter(d=>d.id!==id));finSyncDebtDelete(id);renderFinance()}
+
+// ─── Health: 10K training tracker (localStorage only) ───────
+function healthGet(){try{return JSON.parse(localStorage.getItem('pt_health_runs')||'[]')}catch{return[]}}
+function healthSet(r){localStorage.setItem('pt_health_runs',JSON.stringify(r))}
+function healthId(){return Math.random().toString(36).slice(2,9)}
+function paceToSec(str){if(!str)return null;const p=String(str).trim().split(':').map(Number);if(!p.length||p.some(isNaN))return null;return p.length===3?p[0]*3600+p[1]*60+p[2]:p.length===2?p[0]*60+p[1]:p[0]}
+function secToClock(sec){if(sec==null)return'-';sec=Math.round(sec);const h=Math.floor(sec/3600),m=Math.floor((sec%3600)/60),s=sec%60;return h>0?h+':'+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0'):m+':'+String(s).padStart(2,'0')}
+function secToPace(sec){if(sec==null)return'-';sec=Math.round(sec);return Math.floor(sec/60)+':'+String(sec%60).padStart(2,'0')}
+function healthDateLabel(d){return new Date(d+'T00:00:00').toLocaleDateString('en-IE',{weekday:'short',day:'numeric',month:'short',year:'numeric'})}
+function healthSortedDesc(){return healthGet().map((r,i)=>({r,i})).sort((a,b)=>a.r.date<b.r.date?1:a.r.date>b.r.date?-1:b.i-a.i).map(x=>x.r)}
+let healthChart=null;
+
+function showHealthTab(tab,btn){
+  document.querySelectorAll('#page-health .tab-btn').forEach(b=>b.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  ['Overview','Logrun','History','Records'].forEach(t=>document.getElementById('healthTab'+t).classList.remove('active'));
+  document.getElementById('healthTab'+tab.charAt(0).toUpperCase()+tab.slice(1)).classList.add('active');
+  if(tab==='overview')renderHealthOverview();
+  if(tab==='history')renderHealthHistory();
+  if(tab==='records')renderHealthRecords();
+}
+
+function renderHealth(){
+  const d=document.getElementById('runDate');if(d&&!d.value)d.value=new Date().toISOString().slice(0,10);
+  renderHealthOverview();
+}
+
+function renderHealthOverview(){
+  const el=document.getElementById('healthTabOverview');
+  const runs=healthGet();
+  const best=runs.reduce((m,r)=>Math.max(m,r.distance||0),0);
+  const done=best>=10;
+  const pct=Math.min(best/10*100,100);
+  let firstDate='';
+  if(done){const tens=runs.filter(r=>(r.distance||0)>=10).sort((a,b)=>a.date<b.date?-1:1);if(tens.length)firstDate=tens[0].date}
+
+  let html='<div class="health-goal">';
+  html+='<div class="health-goal-head">Goal: 10K in one stretch</div>';
+  if(done){
+    html+='<div class="health-goal-num done">Goal achieved 🎉</div>';
+    html+=`<div class="health-prog-track"><div class="health-prog-fill done" style="width:100%"></div></div>`;
+    html+=`<div class="health-goal-sub">Best single run: ${best.toFixed(1)}km${firstDate?' · first reached '+healthDateLabel(firstDate):''}</div>`;
+  }else{
+    html+=`<div class="health-goal-num">${best.toFixed(1)}<span style="font-size:1.4rem">km</span></div>`;
+    html+=`<div class="health-prog-track"><div class="health-prog-fill" style="width:${pct}%"></div></div>`;
+    html+=`<div class="health-goal-sub">${(10-best).toFixed(1)}km to go</div>`;
+  }
+  html+='</div>';
+
+  const now=new Date(),ym=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
+  const monthRuns=runs.filter(r=>String(r.date).slice(0,7)===ym);
+  const monthDist=monthRuns.reduce((s,r)=>s+(r.distance||0),0);
+  const monthCal=monthRuns.reduce((s,r)=>s+(r.activeCal||0),0);
+  const paces=monthRuns.map(r=>paceToSec(r.avgPace)).filter(v=>v!=null);
+  const avgPace=paces.length?paces.reduce((a,b)=>a+b,0)/paces.length:null;
+  html+='<div class="hero-stats" style="margin-bottom:20px">';
+  html+=`<div class="hero-stat"><div class="hero-stat-label">Runs This Month</div><div class="hero-stat-value" style="color:var(--coral)">${monthRuns.length}</div></div>`;
+  html+=`<div class="hero-stat"><div class="hero-stat-label">Distance This Month</div><div class="hero-stat-value" style="color:var(--coral);font-size:1.7rem">${monthDist.toFixed(1)}<span style="font-size:1rem">km</span></div></div>`;
+  html+=`<div class="hero-stat"><div class="hero-stat-label">Active Calories</div><div class="hero-stat-value" style="color:var(--coral);font-size:1.7rem">${monthCal.toLocaleString()}</div><div class="hero-stat-sub">this month</div></div>`;
+  html+=`<div class="hero-stat"><div class="hero-stat-label">Avg Pace This Month</div><div class="hero-stat-value" style="color:var(--coral);font-size:1.7rem">${avgPace?secToPace(avgPace):'-'}</div><div class="hero-stat-sub">min/km</div></div>`;
+  html+='</div>';
+
+  html+='<div class="chart-container"><div style="font-size:.9rem;font-weight:600;margin-bottom:14px">Avg Pace — Last 10 Runs</div><canvas id="healthPaceChart"></canvas></div>';
+
+  const last=healthSortedDesc()[0];
+  if(last){
+    html+='<div class="run-card"><div style="font-size:.9rem;font-weight:600;margin-bottom:10px">Last Run — '+healthDateLabel(last.date)+'</div>';
+    html+='<div class="run-card-stats" style="font-size:.85rem">';
+    html+=`<span>📏 ${(last.distance||0).toFixed(1)}km</span><span>⏱ ${last.totalTime||'-'}</span><span>🏃 ${last.avgPace||'-'}/km</span><span>❤️ ${last.avgHeartRate?last.avgHeartRate+'bpm':'-'}</span><span>👟 ${last.avgCadence?last.avgCadence+'spm':'-'}</span><span>⛰ ${last.elevationGain!=null?last.elevationGain+'m':'-'}</span><span>🔥 ${last.activeCal!=null?last.activeCal+'kcal':'-'}</span>`;
+    html+='</div></div>';
+  }
+  el.innerHTML=html;
+  renderHealthPaceChart();
+}
+
+function renderHealthPaceChart(){
+  const canvas=document.getElementById('healthPaceChart');if(!canvas||!chartsReady)return;
+  const runs=healthGet().slice().sort((a,b)=>a.date<b.date?-1:a.date>b.date?1:0).slice(-10);
+  const pts=runs.map(r=>({d:r.date,p:paceToSec(r.avgPace)})).filter(x=>x.p!=null);
+  if(healthChart){healthChart.destroy();healthChart=null}
+  if(!pts.length)return;
+  healthChart=new Chart(canvas,{type:'line',data:{labels:pts.map(x=>new Date(x.d+'T00:00:00').toLocaleDateString('en-IE',{day:'numeric',month:'short'})),datasets:[{label:'Avg pace',data:pts.map(x=>x.p),borderColor:'#e06050',backgroundColor:'rgba(224,96,80,.12)',fill:true,tension:.3,pointRadius:3,pointBackgroundColor:'#e06050',borderWidth:2}]},options:{responsive:true,plugins:{legend:{display:false},tooltip:{backgroundColor:'#181824',borderColor:'#1f1f30',borderWidth:1,padding:10,cornerRadius:8,callbacks:{label:c=>secToPace(c.raw)+' /km'}}},scales:{x:{ticks:{color:'#6a6a80',font:{size:10}},grid:{display:false}},y:{reverse:true,ticks:{color:'#6a6a80',callback:v=>secToPace(v)},grid:{color:'rgba(31,31,48,.5)'}}}}});
+}
+
+function healthAddSplit(){
+  const c=document.getElementById('runSplits');
+  if(c.children.length>=10){toast('Max 10 splits','error');return}
+  const row=document.createElement('div');row.className='split-row';
+  row.innerHTML='<div class="split-km"></div><input class="run-input" data-s="time" placeholder="Time e.g. 5:28"><input class="run-input" data-s="pace" placeholder="Pace e.g. 5:28"><input class="run-input" type="number" data-s="hr" placeholder="HR e.g. 148"><button class="fin-delete" onclick="this.parentElement.remove();healthRenumberSplits()">✕</button>';
+  c.appendChild(row);healthRenumberSplits();
+}
+function healthRenumberSplits(){
+  document.querySelectorAll('#runSplits .split-row').forEach((r,i)=>{r.querySelector('.split-km').textContent='Km '+(i+1)});
+  const btn=document.getElementById('runAddSplitBtn');if(btn)btn.style.display=document.querySelectorAll('#runSplits .split-row').length>=10?'none':'';
+}
+
+function healthSaveRun(){
+  const distance=parseFloat(document.getElementById('runDist').value);
+  const totalTime=document.getElementById('runTime').value.trim();
+  const err=document.getElementById('runErr');
+  if(!distance||distance<=0||!totalTime){err.style.display='block';return}
+  err.style.display='none';
+  const run={
+    id:healthId(),
+    date:document.getElementById('runDate').value||new Date().toISOString().slice(0,10),
+    distance:Math.round(distance*10)/10,
+    totalTime,
+    avgPace:document.getElementById('runPace').value.trim(),
+    avgHeartRate:parseInt(document.getElementById('runHR').value)||null,
+    avgCadence:parseInt(document.getElementById('runCad').value)||null,
+    avgPower:parseInt(document.getElementById('runPow').value)||null,
+    activeCal:parseInt(document.getElementById('runActCal').value)||null,
+    totalCal:parseInt(document.getElementById('runTotCal').value)||null,
+    elevationGain:parseInt(document.getElementById('runElev').value)||null,
+    splits:[],
+    notes:document.getElementById('runNotes').value.trim()
+  };
+  document.querySelectorAll('#runSplits .split-row').forEach((r,i)=>{
+    const time=r.querySelector('[data-s="time"]').value.trim();
+    const pace=r.querySelector('[data-s="pace"]').value.trim();
+    const hr=parseInt(r.querySelector('[data-s="hr"]').value)||null;
+    if(time||pace||hr!=null)run.splits.push({km:i+1,time,pace,heartRate:hr});
+  });
+  const runs=healthGet();runs.push(run);healthSet(runs);
+  ['runDist','runTime','runPace','runHR','runCad','runPow','runActCal','runTotCal','runElev','runNotes'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('runSplits').innerHTML='';healthRenumberSplits();
+  toast('Run saved','success');
+  document.querySelectorAll('#page-health .tab-btn').forEach((b,i)=>b.classList.toggle('active',i===2));
+  ['Overview','Logrun','History','Records'].forEach(t=>document.getElementById('healthTab'+t).classList.remove('active'));
+  document.getElementById('healthTabHistory').classList.add('active');
+  renderHealthHistory();
+}
+
+function renderHealthHistory(){
+  const el=document.getElementById('healthTabHistory');
+  const runs=healthSortedDesc();
+  if(!runs.length){el.innerHTML='<div class="fin-empty">No runs logged yet. Go to Log run to add your first.</div>';return}
+  el.innerHTML=runs.map(r=>{
+    const paces=r.splits.map(s=>paceToSec(s.pace)).filter(v=>v!=null);
+    const fastest=paces.length?Math.min(...paces):null,slowest=paces.length?Math.max(...paces):null;
+    let splitsTable='';
+    if(r.splits.length){
+      splitsTable='<table class="run-splits-table"><thead><tr><th>Km</th><th>Time</th><th>Pace</th><th>Heart rate</th></tr></thead><tbody>';
+      r.splits.forEach(s=>{
+        const ps=paceToSec(s.pace);
+        const cls=(ps!=null&&ps===fastest&&paces.length>1)?'split-fastest':(ps!=null&&ps===slowest&&paces.length>1)?'split-slowest':'';
+        splitsTable+=`<tr><td>${s.km}</td><td>${s.time||'-'}</td><td class="${cls}">${s.pace||'-'}</td><td>${s.heartRate!=null?s.heartRate:'-'}</td></tr>`;
+      });
+      splitsTable+='</tbody></table>';
+    }
+    const statBits=[];
+    statBits.push('⏱ '+(r.totalTime||'-'));
+    statBits.push('🏃 '+(r.avgPace||'-')+'/km');
+    if(r.avgHeartRate!=null)statBits.push('❤️ '+r.avgHeartRate+'bpm');
+    if(r.avgCadence!=null)statBits.push('👟 '+r.avgCadence+'spm');
+    if(r.elevationGain!=null)statBits.push('⛰ '+r.elevationGain+'m');
+    return `<div class="run-card">
+      <div class="run-card-top"><div class="run-card-date">${healthDateLabel(r.date)}</div><div class="run-card-dist">${(r.distance||0).toFixed(1)}km</div></div>
+      <div class="run-card-stats">${statBits.map(b=>'<span>'+b+'</span>').join('')}</div>
+      ${r.splits.length?`<button class="run-splits-toggle" onclick="healthToggleSplits(this)" data-open="0">Show splits ▼</button><div style="display:none">${splitsTable}</div>`:''}
+      ${r.notes?'<div class="run-notes">'+r.notes.replace(/</g,'&lt;')+'</div>':''}
+      <div style="text-align:right"><button class="run-delete" onclick="healthDeleteRun('${r.id}')">Delete</button></div>
+    </div>`;
+  }).join('');
+}
+function healthToggleSplits(btn){
+  const open=btn.dataset.open==='1';
+  btn.dataset.open=open?'0':'1';
+  btn.textContent=open?'Show splits ▼':'Hide splits ▲';
+  btn.nextElementSibling.style.display=open?'none':'block';
+}
+function healthDeleteRun(id){
+  if(!confirm('Delete this run? This cannot be undone.'))return;
+  healthSet(healthGet().filter(r=>r.id!==id));
+  renderHealthHistory();toast('Run deleted','success');
+}
+
+function renderHealthRecords(){
+  const el=document.getElementById('healthTabRecords');
+  const runs=healthGet();
+  if(runs.length<3){el.innerHTML='<div class="fin-empty">Keep logging runs — records build up after 3+ entries.</div>';return}
+  const byMax=(arr,key)=>arr.filter(r=>r[key]!=null).sort((a,b)=>b[key]-a[key])[0];
+  const bestDist=byMax(runs,'distance');
+  const tens=runs.filter(r=>(r.distance||0)>=10&&paceToSec(r.totalTime)!=null).sort((a,b)=>paceToSec(a.totalTime)-paceToSec(b.totalTime));
+  const best10k=tens[0];
+  let fastestKm=null;
+  runs.forEach(r=>r.splits.forEach(s=>{const p=paceToSec(s.pace);if(p!=null&&(!fastestKm||p<fastestKm.p))fastestKm={p,date:r.date}}));
+  const over5=runs.filter(r=>(r.distance||0)>5&&paceToSec(r.avgPace)!=null).sort((a,b)=>paceToSec(a.avgPace)-paceToSec(b.avgPace));
+  const bestPace=over5[0];
+  const over3=runs.filter(r=>(r.distance||0)>3&&r.avgHeartRate!=null).sort((a,b)=>a.avgHeartRate-b.avgHeartRate);
+  const lowHR=over3[0];
+  const bestElev=byMax(runs,'elevationGain');
+  const bestCal=byMax(runs,'activeCal');
+  const totalRuns=runs.length;
+  const totalDist=runs.reduce((s,r)=>s+(r.distance||0),0);
+  const totalCal=runs.reduce((s,r)=>s+(r.activeCal||0),0);
+
+  const card=(label,val,sub)=>`<div class="hero-stat"><div class="hero-stat-label">${label}</div><div class="hero-stat-value" style="color:var(--coral);font-size:1.5rem">${val}</div>${sub?'<div class="hero-stat-sub">'+sub+'</div>':''}</div>`;
+  let html='<div class="hero-stats" style="grid-template-columns:repeat(3,1fr);margin-bottom:12px">';
+  html+=card('Best Single Run',bestDist?bestDist.distance.toFixed(1)+'km':'-',bestDist?healthDateLabel(bestDist.date):'');
+  if(best10k)html+=card('Best 10K Time',best10k.totalTime,healthDateLabel(best10k.date));
+  html+=card('Fastest Kilometer',fastestKm?secToPace(fastestKm.p)+'/km':'-',fastestKm?healthDateLabel(fastestKm.date):'');
+  html+=card('Best Avg Pace (>5km)',bestPace?bestPace.avgPace+'/km':'-',bestPace?healthDateLabel(bestPace.date):'');
+  html+=card('Lowest Avg HR (>3km)',lowHR?lowHR.avgHeartRate+'bpm':'-',lowHR?healthDateLabel(lowHR.date):'');
+  html+=card('Highest Elevation',bestElev?bestElev.elevationGain+'m':'-',bestElev?healthDateLabel(bestElev.date):'');
+  html+=card('Most Active Cal',bestCal?bestCal.activeCal+'kcal':'-',bestCal?healthDateLabel(bestCal.date):'');
+  html+='</div>';
+  html+='<div class="hero-stats" style="grid-template-columns:repeat(3,1fr);margin-bottom:20px">';
+  html+=card('Total Runs',totalRuns,'lifetime');
+  html+=card('Total Distance',totalDist.toFixed(1)+'km','lifetime');
+  html+=card('Total Active Cal',totalCal.toLocaleString(),'lifetime');
+  html+='</div>';
+
+  const prog=runs.filter(r=>(r.distance||0)>5).sort((a,b)=>a.date<b.date?-1:1);
+  if(prog.length){
+    html+='<div style="font-size:.9rem;font-weight:600;margin-bottom:10px">Pace Progression (runs over 5km)</div>';
+    html+='<div style="overflow-x:auto;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:8px 12px"><table style="width:100%;border-collapse:collapse;font-size:.8rem;min-width:360px"><thead><tr style="border-bottom:2px solid var(--border)"><th style="text-align:left;padding:8px;color:var(--text3)">Date</th><th style="text-align:right;padding:8px;color:var(--text3)">Distance</th><th style="text-align:right;padding:8px;color:var(--text3)">Avg pace</th></tr></thead><tbody>';
+    prog.forEach(r=>{html+=`<tr style="border-bottom:1px solid var(--border)"><td style="padding:8px">${healthDateLabel(r.date)}</td><td style="padding:8px;text-align:right">${r.distance.toFixed(1)}km</td><td style="padding:8px;text-align:right;color:var(--coral);font-weight:600">${r.avgPace||'-'}</td></tr>`});
+    html+='</tbody></table></div>';
+  }
+  el.innerHTML=html;
+}
 
 // ─── Sync: pull latest from Supabase, keep every device in step ─────
 async function pullAll(migrate){
