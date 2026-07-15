@@ -249,6 +249,9 @@ a{color:var(--accent);text-decoration:none}
 .fin-breakdown-fill{height:100%;border-radius:2px}
 .debt-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px;margin-bottom:12px;position:relative;overflow:hidden}
 .debt-card-bar{position:absolute;bottom:0;left:0;right:0;height:3px;background:var(--red);opacity:.5}
+.debt-card.cleared{border-color:rgba(74,222,128,.45);background:var(--green-dim)}
+.debt-card.cleared .debt-card-bar{background:var(--green);opacity:.8}
+.debt-card.cleared .debt-name{color:var(--green)}
 .debt-name{font-weight:600;font-size:.95rem;margin-bottom:8px}
 .debt-balance{font-family:var(--font-display);font-size:1.6rem;font-weight:700;color:var(--red);margin-bottom:8px}
 .debt-detail{font-size:.78rem;color:var(--text2);margin-bottom:4px}
@@ -353,6 +356,10 @@ a{color:var(--accent);text-decoration:none}
     <div class="hero-stat"><div class="hero-stat-label">Avg Adoration Duration</div><div class="hero-stat-value" id="dashAdorationAvg" style="font-size:1.6rem">-</div><div class="hero-stat-sub">minutes per visit</div></div>
     <div class="hero-stat"><div class="hero-stat-label">Total Adoration</div><div class="hero-stat-value" id="dashAdorationTotal" style="font-size:1.6rem">-</div><div class="hero-stat-sub">all-time hours</div></div>
     <div class="hero-stat"><div class="hero-stat-label">Longest Sitting</div><div class="hero-stat-value" id="dashAdorationBest" style="font-size:1.6rem">-</div><div class="hero-stat-sub">personal best</div></div>
+  </div>
+  <div class="hero-stats" style="grid-template-columns:repeat(2,1fr);margin-bottom:24px">
+    <div class="hero-stat"><div class="hero-stat-label">Avg Wake Time</div><div class="hero-stat-value" id="dashWakeAvg" style="font-size:1.8rem">-</div><div class="hero-stat-sub">across all entries</div></div>
+    <div class="hero-stat"><div class="hero-stat-label">Avg Sleep Time</div><div class="hero-stat-value" id="dashSleepAvg" style="font-size:1.8rem">-</div><div class="hero-stat-sub">across all entries</div></div>
   </div>
   <div class="heatmap-wrap">
     <div class="heatmap-title"><span>Discipline Heatmap</span><span style="font-size:.7rem;color:var(--text3);font-weight:400;margin-left:auto">Last 16 weeks</span></div>
@@ -653,6 +660,22 @@ function calcAdorationBest(){
   Object.values(disciplineCache).forEach(e=>{if(e.adoration&&parseInt(e.adoration)>best)best=parseInt(e.adoration)});
   return best;
 }
+function avgTimeOfDay(field,wrapPastMidnight){
+  const mins=[];
+  Object.values(disciplineCache).forEach(e=>{
+    const v=e[field];
+    if(v&&/^\d{1,2}:\d{2}$/.test(v)){
+      let[h,m]=v.split(':').map(Number);
+      let t=h*60+m;
+      if(wrapPastMidnight&&h<12)t+=1440;
+      mins.push(t);
+    }
+  });
+  if(!mins.length)return null;
+  let avg=Math.round(mins.reduce((a,b)=>a+b,0)/mins.length);
+  avg=((avg%1440)+1440)%1440;
+  return String(Math.floor(avg/60)).padStart(2,'0')+':'+String(avg%60).padStart(2,'0');
+}
 
 // ─── Dashboard ──────────────────────────────────────────────
 function renderDashboard(){
@@ -686,6 +709,8 @@ function renderDashboard(){
   const bestEl=document.getElementById('dashAdorationBest');
   if(bestMin>=60){const h=Math.floor(bestMin/60),m=bestMin%60;bestEl.textContent=m?h+'h '+m+'m':h+'h'}else{bestEl.textContent=bestMin?bestMin+'m':'-'}
   bestEl.style.color=bestMin>=60?'var(--green)':bestMin>=30?'var(--yellow)':'var(--red)';
+  document.getElementById('dashWakeAvg').textContent=avgTimeOfDay('wake_time',false)||'-';
+  document.getElementById('dashSleepAvg').textContent=avgTimeOfDay('sleep_time',true)||'-';
   renderHeatmap();renderLast7Days();renderDashboardCards();
 }
 
@@ -1461,7 +1486,7 @@ function renderFinExpenses(data,key){
     const entries=byCat[cat.id];if(!entries||!entries.length)return;
     const catTotal=entries.reduce((s,e)=>s+e.amount,0);
     html+=`<div class="fin-cat-section"><div class="fin-cat-header"><span class="fin-cat-name" style="color:${cat.color}">${cat.emoji} ${cat.label}</span><span class="fin-cat-total" style="color:${cat.color}">€${catTotal.toLocaleString()}</span></div>`;
-    entries.forEach(e=>{html+=`<div class="fin-entry"><span class="fin-entry-label">${e.recurId?'🔁 ':''}${e.label}${e.date?' <span style="font-size:.68rem;color:var(--text3)">'+finOrdinal(parseInt(e.date.slice(8,10)))+'</span>':''}</span><span class="fin-entry-amount">€${e.amount.toLocaleString()}</span><button class="fin-delete" onclick="finDeleteExpense('${key}','${e.id}')">✕</button></div>`});
+    entries.forEach(e=>{html+=`<div class="fin-entry"><span class="fin-entry-label">${e.recurId?'🔁 ':''}${e.label}${e.date?' <span style="font-size:.68rem;color:var(--text3)">'+finOrdinal(parseInt(e.date.slice(8,10)))+'</span>':''}${e.debtId?' <span style="font-size:.68rem;color:var(--accent)">→ '+finDebtName(e.debtId)+'</span>':''}</span><span class="fin-entry-amount">€${e.amount.toLocaleString()}</span><button class="fin-delete" onclick="finDeleteExpense('${key}','${e.id}')">✕</button></div>`});
     html+='</div>';
   });
   container.innerHTML=html||'<div class="fin-empty">No expenses this month.</div>';
@@ -1476,12 +1501,14 @@ function renderFinDebts(){
     list.innerHTML='<div class="fin-empty">Add your debts here.<br>This is the most important tab to fill in honestly.</div>';
     totalBar.style.display='none';
   }else{
-    const totalDebt=debts.reduce((s,d)=>s+d.balance,0);
+    const totalDebt=debts.reduce((s,d)=>s+Math.max(0,d.balance),0);
     document.getElementById('finDebtTotal').textContent='€'+totalDebt.toLocaleString();
     totalBar.style.display='';
     list.innerHTML=debts.map(d=>{
-      const months=d.minPayment>0?Math.ceil(d.balance/d.minPayment):null;
-      return `<div class="debt-card"><button class="fin-delete" style="position:absolute;top:10px;right:10px" onclick="finDeleteDebt('${d.id}')">✕</button><div class="debt-name">${d.label}</div><div class="debt-balance">€${d.balance.toLocaleString()}</div>${d.minPayment?'<div class="debt-detail">Min payment: €'+d.minPayment.toLocaleString()+'/mo</div>':''}${d.apr?'<div class="debt-detail">APR: '+d.apr+'%</div>':''}${months?'<div class="debt-payoff">~'+months+' month'+(months!==1?'s':'')+' at minimum payment</div>':''}<div class="debt-card-bar"></div></div>`
+      const cleared=d.balance<=0;
+      const shownBal=Math.max(0,d.balance);
+      const months=(!cleared&&d.minPayment>0)?Math.ceil(shownBal/d.minPayment):null;
+      return `<div class="debt-card${cleared?' cleared':''}"><button class="fin-delete" style="position:absolute;top:10px;right:10px" onclick="finDeleteDebt('${d.id}')">✕</button><div class="debt-name">${d.label}${cleared?' ✓':''}</div><div class="debt-balance" style="color:${cleared?'var(--green)':'var(--red)'}">${cleared?'Cleared':'€'+shownBal.toLocaleString()}</div>${!cleared&&d.minPayment?'<div class="debt-detail">Min payment: €'+d.minPayment.toLocaleString()+'/mo</div>':''}${!cleared&&d.apr?'<div class="debt-detail">APR: '+d.apr+'%</div>':''}${months?'<div class="debt-payoff">~'+months+' month'+(months!==1?'s':'')+' at minimum payment</div>':''}${cleared?'<div class="debt-payoff" style="color:var(--green)">Fully paid off 🎉</div>':''}<div class="debt-card-bar"></div></div>`
     }).join('');
   }
 }
@@ -1532,7 +1559,9 @@ function showFinForm(type){
   }else if(type==='expense'){
     document.getElementById('finAddExpenseBtn').style.display='none';
     const opts=FIN_CATS.map(c=>`<option value="${c.id}">${c.emoji} ${c.label}</option>`).join('');
-    document.getElementById('finExpenseFormWrap').innerHTML=`<div class="fin-add-form"><select id="finExpCat" style="min-width:160px">${opts}</select><input type="text" id="finExpDesc" placeholder="Description" style="flex:1;min-width:140px"><input type="number" id="finExpAmt" placeholder="€ Amount" style="width:120px" min="0"><button class="fin-form-btn primary" onclick="finAddExpense()">Add</button><button class="fin-form-btn cancel" onclick="finCancelForm('expense')">Cancel</button></div>`;
+    const payable=finGetDebts().filter(d=>d.balance>0);
+    const debtOpts='<option value="">Not linked to a debt</option>'+payable.map(d=>`<option value="${d.id}">${d.label} (€${Math.max(0,d.balance).toLocaleString()} left)</option>`).join('');
+    document.getElementById('finExpenseFormWrap').innerHTML=`<div class="fin-add-form"><select id="finExpCat" onchange="finToggleDebtSelect()" style="min-width:160px">${opts}</select><select id="finExpDebt" style="min-width:170px;display:none">${debtOpts}</select><input type="text" id="finExpDesc" placeholder="Description" style="flex:1;min-width:140px"><input type="number" id="finExpAmt" placeholder="€ Amount" style="width:120px" min="0"><button class="fin-form-btn primary" onclick="finAddExpense()">Add</button><button class="fin-form-btn cancel" onclick="finCancelForm('expense')">Cancel</button></div>`;
     document.getElementById('finExpDesc').focus();
   }else if(type==='debt'){
     document.getElementById('finAddDebtBtn').style.display='none';
@@ -1554,13 +1583,33 @@ function finAddIncome(){
   data.income.push({id:finId(),label,amount});
   finSaveMonth(key,data);finCancelForm('income');renderFinance();toast('Income added','success');
 }
+function finToggleDebtSelect(){
+  const sel=document.getElementById('finExpDebt');
+  if(sel)sel.style.display=document.getElementById('finExpCat').value==='debt_repayment'?'':'none';
+}
+function finApplyDebtPayment(debtId,amount){
+  const debts=finGetDebts(),d=debts.find(x=>x.id===debtId);if(!d)return;
+  d.balance=Math.round((d.balance-amount)*100)/100;
+  finSetDebts(debts);finSyncDebtUpsert(d);
+}
+function finRestoreDebtPayment(debtId,amount){
+  const debts=finGetDebts(),d=debts.find(x=>x.id===debtId);if(!d)return;
+  d.balance=Math.round((d.balance+amount)*100)/100;
+  finSetDebts(debts);finSyncDebtUpsert(d);
+}
+function finDebtName(id){const d=finGetDebts().find(x=>x.id===id);return d?d.label:''}
 function finAddExpense(){
   const category=document.getElementById('finExpCat').value;
   const label=document.getElementById('finExpDesc').value.trim();
   const amount=parseFloat(document.getElementById('finExpAmt').value);
   if(!label||!amount||amount<=0){toast('Enter description and amount','error');return}
+  const entry={id:finId(),label,amount,category};
+  if(category==='debt_repayment'){
+    const debtId=document.getElementById('finExpDebt').value;
+    if(debtId){entry.debtId=debtId;finApplyDebtPayment(debtId,amount)}
+  }
   const key=finMonthKey(finMonthOffset),data=finGetMonth(key);
-  data.expenses.push({id:finId(),label,amount,category});
+  data.expenses.push(entry);
   finSaveMonth(key,data);finCancelForm('expense');renderFinance();toast('Expense added','success');
 }
 function finAddDebt(){
@@ -1574,7 +1623,7 @@ function finAddDebt(){
   finSetDebts(debts);finSyncDebtUpsert(newDebt);finCancelForm('debt');renderFinance();toast('Debt added','success');
 }
 function finDeleteIncome(key,id){const data=finGetMonth(key);data.income=data.income.filter(e=>e.id!==id);finSaveMonth(key,data);renderFinance()}
-function finDeleteExpense(key,id){const data=finGetMonth(key);data.expenses=data.expenses.filter(e=>e.id!==id);finSaveMonth(key,data);renderFinance()}
+function finDeleteExpense(key,id){const data=finGetMonth(key);const e=data.expenses.find(x=>x.id===id);if(e&&e.debtId)finRestoreDebtPayment(e.debtId,e.amount);data.expenses=data.expenses.filter(x=>x.id!==id);finSaveMonth(key,data);renderFinance()}
 function finDeleteDebt(id){finSetDebts(finGetDebts().filter(d=>d.id!==id));finSyncDebtDelete(id);renderFinance()}
 
 // ─── Boot ───────────────────────────────────────────────────
