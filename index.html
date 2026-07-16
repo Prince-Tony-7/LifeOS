@@ -1965,7 +1965,7 @@ function renderHealthHistory(){
       '<div class="run-card-stats">'+bits.map(b=>'<span>'+b+'</span>').join('')+'</div>'+
       (r.splits.length?'<button class="run-splits-toggle" onclick="healthToggleSplits(this)" data-open="0">Show splits ▼</button><div style="display:none">'+splitsTable+'</div>':'')+
       (r.notes?'<div class="run-notes">'+r.notes.replace(/</g,'&lt;')+'</div>':'')+
-      '<div style="text-align:right"><button class="run-delete" onclick="healthDeleteRun(\''+r.id+'\')">Delete</button></div>'+
+      '<div style="text-align:right"><button class="run-delete" onclick="healthConfirmDelete(this,\''+r.id+'\')">Delete</button></div>'+
     '</div>';
   }).join('');
 }
@@ -1975,10 +1975,18 @@ function healthToggleSplits(btn){
   btn.textContent=open?'Show splits ▼':'Hide splits ▲';
   btn.nextElementSibling.style.display=open?'none':'block';
 }
-function healthDeleteRun(id){
-  if(!confirm('Delete this run? This cannot be undone.'))return;
-  healthSet(healthGet().filter(r=>r.id!==id));healthSyncDelete(id);
+const healthPendingDelete=new Set();
+function healthConfirmDelete(btn,id){
+  if(btn.dataset.armed==='1'){healthDeleteRun(id);return}
+  btn.dataset.armed='1';btn.textContent='Tap again to confirm';btn.style.color='var(--red)';btn.style.borderColor='var(--red)';
+  setTimeout(()=>{if(btn&&document.body.contains(btn)){btn.dataset.armed='0';btn.textContent='Delete';btn.style.color='';btn.style.borderColor=''}},4000);
+}
+async function healthDeleteRun(id){
+  healthPendingDelete.add(id);
+  healthSet(healthGet().filter(r=>r.id!==id));
   renderHealthHistory();toast('Run deleted','success');
+  await healthSyncDelete(id);
+  healthPendingDelete.delete(id);
 }
 
 // ── Records ──
@@ -2036,7 +2044,7 @@ async function pullAll(migrate){
   if(discRows){disciplineCache={};discRows.forEach(r=>{disciplineCache[r.date]=r.entry});lsSet('discipline_log',disciplineCache)}
   if(scoreRows){scoreCache={};scoreRows.forEach(r=>{scoreCache[r.week]=r.scores});lsSet('score_log',scoreCache)}
   if(healthRows){
-    if(healthRows.length){healthSet(healthRows.map(r=>r.run))}
+    if(healthRows.length){healthSet(healthRows.map(r=>r.run).filter(run=>!healthPendingDelete.has(run.id)))}
     else if(migrate){const local=healthGet();for(const run of local){await sbFetch('health_log','POST',{id:run.id,run,updated_at:new Date().toISOString()})}}
   }
   if(finRows){
