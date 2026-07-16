@@ -1944,15 +1944,16 @@ function renderHealthHistory(){
   const runs=healthSortedDesc();
   if(!runs.length){el.innerHTML='<div class="fin-empty">No runs logged yet. Go to Log run to add your first.</div>';return}
   el.innerHTML=runs.map(r=>{
-    const laps=r.splits.map(s=>paceToSec(s.time)).filter(v=>v!=null);
+    const full=Math.floor(r.distance||0);
+    const laps=r.splits.filter(s=>s.km<=full).map(s=>paceToSec(s.time)).filter(v=>v!=null);
     const fastest=laps.length>1?Math.min(...laps):null,slowest=laps.length>1?Math.max(...laps):null;
     let splitsTable='';
     if(r.splits.length){
       splitsTable='<table class="run-splits-table"><thead><tr><th>Km</th><th>Pace /km</th><th>Heart rate</th></tr></thead><tbody>';
       r.splits.forEach(s=>{
-        const ls=paceToSec(s.time);
-        const cls=(ls!=null&&ls===fastest)?'split-fastest':(ls!=null&&ls===slowest)?'split-slowest':'';
-        splitsTable+='<tr><td>'+s.km+'</td><td class="'+cls+'">'+(s.time||'-')+'</td><td>'+(s.heartRate!=null?s.heartRate:'-')+'</td></tr>';
+        const ls=paceToSec(s.time),partial=s.km>full;
+        const cls=(!partial&&ls!=null&&ls===fastest)?'split-fastest':(!partial&&ls!=null&&ls===slowest)?'split-slowest':'';
+        splitsTable+='<tr'+(partial?' style="opacity:.55"':'')+'><td>'+s.km+(partial?' <span style="font-size:.68rem;color:var(--text3)">(partial)</span>':'')+'</td><td class="'+cls+'">'+(s.time||'-')+'</td><td>'+(s.heartRate!=null?s.heartRate:'-')+'</td></tr>';
       });
       splitsTable+='</tbody></table>';
     }
@@ -1999,7 +2000,7 @@ function renderHealthRecords(){
   const tens=runs.filter(r=>(r.distance||0)>=10&&runTotalSec(r)!=null).sort((a,b)=>runTotalSec(a)-runTotalSec(b));
   const best10k=tens[0];
   let fastestKm=null;
-  runs.forEach(r=>r.splits.forEach(s=>{const p=paceToSec(s.time);if(p!=null&&(!fastestKm||p<fastestKm.p))fastestKm={p,date:r.date}}));
+  runs.forEach(r=>{const full=Math.floor(r.distance||0);r.splits.forEach(s=>{if(s.km>full)return;const p=paceToSec(s.time);if(p!=null&&(!fastestKm||p<fastestKm.p))fastestKm={p,date:r.date}})});
   const over5=runs.filter(r=>(r.distance||0)>5&&paceToSec(r.avgPace)!=null).sort((a,b)=>paceToSec(a.avgPace)-paceToSec(b.avgPace));
   const bestPace=over5[0];
   const over3=runs.filter(r=>(r.distance||0)>3&&r.avgHeartRate!=null).sort((a,b)=>a.avgHeartRate-b.avgHeartRate);
